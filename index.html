@@ -590,10 +590,13 @@
   let waterY = 0;
   let tide = 0.62;
   let hMoon = 0.62, hMoonTarget = 0.62;
-  /* 海水开场：只做一件事 —— 整幅水线一起从屏幕下方沿缓动慢慢涨到静水线。
-     单段、无横向成分、无末端过冲；涨完那一刻精确等于静水线，所以没有跳变。
-     双击月亮仍是整片放干 / 重新灌满，不重播开场。 */
-  let seaOn = true;
+  /* 海水只由一个「充满度」决定水线位置：1 = 水线精确落在静水线（满），
+     0 = 整条水线沉到视口下方（干）。
+     开场用 easeInOutCubic 从 0 涨到 1；双击月亮则让充满度缓慢跟随目标，
+     所以放干与灌满都是「整幅水线慢慢沉下去 / 慢慢升上来」，不是瞬间开关。 */
+  let seaOn = true;               /* 目标状态：true 要有海水，false 要放干 */
+  let seaFill = 1;                /* 实际充满度（0..1），缓慢跟随 seaOn */
+  const SEA_RATE = 0.9;           /* 放干 / 灌满的速度：越小越慢（约 3 秒走完九成） */
   let introT = 0;                 /* 开场计时（秒） */
   let introDone = false;
   const INTRO_RISE = 3.0;        /* 从屏幕下方缓慢涨到静水线所需时长（秒） */
@@ -654,6 +657,10 @@
 
   /* 水面采样缓存（轮廓线共用同一条波） */
   const WSTEP = 24;
+  /* 三个波形分量：各自「横跨屏幕」的周期数与振幅（px）。
+     用跨屏周期数而不是写死的像素频率，手机与电脑的海面才是同一套观感。 */
+  const WAVE_N = [0.84, 1.92, 0.385];
+  const WAVE_A = [4.2, 2.4, 6.4];
   let waveN = 0;
   let waveBuf = null;
 
@@ -1066,6 +1073,9 @@
     tide = follow(tide, mouse.dragTide ? hMoonTarget : hMoon, mouse.dragTide ? 14 : 2.4, dt);
     waterY = lerp(H * 0.86, H * 0.40, tide);
 
+    /* 放干 / 灌满：充满度缓慢跟随目标，和潮位共用 follow，帧率无关、不会瞬间跳 */
+    seaFill = follow(seaFill, seaOn ? 1 : 0, SEA_RATE, dt);
+
     /* 开场：推进计时。INTRO_END 时刻水面已精确等于静水线，故切换 introDone 无跳变 */
     if (!introDone && isFinite(dt) && dt > 0){
       introT += dt;
@@ -1184,26 +1194,38 @@
     return lerp(a, b, f);
   }
 
-  /* 开场水面：整幅水线一起从视口下方缓动升到静水线。没有逐列差异，所以看不出横向扫入。 */
+  /* 水面位置：整幅水线一起升降，没有逐列差异，所以看不出横向扫入。
+     充满度 = 开场进度 × 放干进度，两者相乘，所以「开场没涨完就双击月亮」也不会打架。 */
+  function seaAmount(){
+    let f = isFinite(seaFill) ? clamp(seaFill, 0, 1) : 1;
+    if (!introDone){
+      const p = easeInOutCubic(clamp(introT / INTRO_RISE, 0, 1));
+      f *= isFinite(p) ? p : 0;
+    }
+    return clamp(f, 0, 1);
+  }
   function introSurface(rest){
-    if (introDone) return rest;
-    const p = easeInOutCubic(clamp(introT / INTRO_RISE, 0, 1));
-    return lerp(H + INTRO_SINK, rest, p);
+    const f = seaAmount();
+    if (f >= 1) return rest;
+    return lerp(H + INTRO_SINK, rest, f);
   }
 
   function sampleWave(t){
+    /* 空间频率按「横跨屏幕多少浪」折算，而不是写死像素频率：
+       否则宽屏会挤进四倍多的细浪，海面观感与手机就完全是两回事。 */
+    const kn = 6.283185307179586 / Math.max(1, W);
     for (let j = 0; j < waveN; j++){
       const x = j * WSTEP;
-      const s = Math.sin(x * 0.0135 + t * 0.85) * 4.2
-              + Math.sin(x * 0.031 - t * 1.4) * 2.4
-              + Math.sin(x * 0.0062 + t * 0.5) * 6.4;
+      const s = Math.sin(x * kn * WAVE_N[0] + t * 0.85) * WAVE_A[0]
+              + Math.sin(x * kn * WAVE_N[1] - t * 1.4) * WAVE_A[1]
+              + Math.sin(x * kn * WAVE_N[2] + t * 0.5) * WAVE_A[2];
       const v = introSurface(waterY + rippleAt(x) + s);
       waveBuf[j] = isFinite(v) ? v : H + INTRO_SINK;   /* 数值异常时退回屏幕外，绝不画到屏幕顶端 */
     }
   }
 
   function drawWater(t){
-    if (!seaOn) return;
+    if (seaFill <= 0.001) return;   /* 放干到见底就整段跳过，不再画屏外线 */
 
     /* 水下：只剩一条条细线（等深线），越深越淡 */
     ctx.lineWidth = 1;
@@ -1520,11 +1542,12 @@
   function moonHit(x, y){
     return Math.hypot(x - moonX, y - moonY) < moonR + 30;
   }
-  /* 双击月亮：放干 / 重新灌满海水（整片切换，不做满屏推进动画） */
+  /* 双击月亮：缓慢放干 / 缓慢重新灌满海水（水线整幅沉下去再升上来，不做瞬间开关） */
   let moonTapAt = 0, moonTapX = 0, moonTapY = 0;
   function toggleWater(){
     seaOn = !seaOn;
-    if (reduced) layoutStatic();
+    /* 减少动态偏好下不走动画，直接落位 */
+    if (reduced){ seaFill = seaOn ? 1 : 0; layoutStatic(); }
   }
   /* 把指针投影到月亮轨道的两端连线上：桌面近似上下拖，窄屏近似左右拖 */
   function setMoonFromPointer(x, y){

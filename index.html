@@ -1,716 +1,1757 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>导航台 · 网页合集</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="color-scheme" content="light" />
+<title>月与海 · 站点导览</title>
 <style>
-  :root {
-    --pink-deep: #ec6f9c;
-    --blue-deep: #6f9cec;
-    --ink: #4a4a63;
-    --ink-soft: #7c7c96;
-    --line: rgba(255, 255, 255, 0.7);
-    --shadow: 0 8px 28px rgba(140, 150, 200, 0.16);
+  :root{
+    /* 纸白 · 灰 · 墨黑；中性灰与红只做点缀 */
+    --ink:#101418;
+    --dim:rgba(16,20,24,.56);
+    --faint:rgba(16,20,24,.34);
+    --line:rgba(16,20,24,.14);
+    --paper:#f4f5f6;
+    --gray-hl:#666d78;   /* 小工具（次池）hover / lit 的灰，比静息灰再深一档 */
+    --red:#d8352a;
+    --lilac:#b39ddb;
   }
-
-  * { box-sizing: border-box; }
-
-  html, body { height: 100%; }
-
-  body {
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    color: var(--ink);
-    font-family: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", -apple-system,
-      BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background-color: #fdf1f7;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
+  *{box-sizing:border-box}
+  html,body{
+    height:100%;margin:0;overflow:hidden;
+    background:var(--paper);
+    background-image:linear-gradient(180deg,#f8f9fa 0%,#eceef0 100%);
+    color:var(--ink);
+    font-family:"Helvetica Neue",Helvetica,Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
   }
+  [hidden]{display:none !important}
 
-  /* 静态底层：渐变 + 噪点。只栅格化一次并缓存，不参与动画，滚动时零重绘 */
-  #bg {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background-color: #fdf1f7;
+  #sea{position:fixed;inset:0;display:block;cursor:default;touch-action:none}
+
+  #deck{position:fixed;inset:0;overflow:hidden;pointer-events:none}
+
+  /* 星尘：由浏览器一次性栅格化的静态图层，只在合成器上做位移/明暗，不占每帧绘制 */
+  #dust{
+    position:absolute;left:0;right:0;top:0;height:62%;
+    pointer-events:none;
+    will-change:transform;
+    animation:dustPulse 13s ease-in-out infinite;
+    background-repeat:repeat;
     background-image:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E"),
-      linear-gradient(155deg, #fdf1f7 0%, #f3f0fb 38%, #eaf2fd 70%, #e6f6ff 100%);
-    background-size: 160px 160px, 100% 100%;
-    background-repeat: repeat, no-repeat;
-    background-blend-mode: soft-light, normal;
+      radial-gradient(circle at 22% 34%, rgba(16,20,24,.20) 0 .7px, transparent .7px),
+      radial-gradient(circle at 68% 12%, rgba(16,20,24,.16) 0 .9px, transparent .9px),
+      radial-gradient(circle at 44% 76%, rgba(16,20,24,.22) 0 .6px, transparent .6px),
+      radial-gradient(circle at 86% 62%, rgba(16,20,24,.13) 0 1.1px, transparent 1.1px),
+      radial-gradient(circle at  8% 88%, rgba(16,20,24,.15) 0 .8px, transparent .8px),
+      radial-gradient(circle at 57% 47%, rgba(16,20,24,.18) 0 .75px, transparent .75px);
+    background-size:
+      173px 149px, 211px 187px, 137px 233px, 251px 197px, 191px 163px, 293px 271px;
+    background-position:
+      0 0, 37px 61px, 89px 23px, 13px 101px, 71px 47px, 149px 133px;
+  }
+  @keyframes dustPulse{0%,100%{opacity:.62}50%{opacity:1}}
+
+  /* ---------- 背景台词：压在月亮与海之下，仿古宋体 · 极淡 · 呼吸 · 浮动 ---------- */
+  #lyrics{
+    position:fixed;inset:0;z-index:0;overflow:hidden;
+    pointer-events:none;
+    font-family:"焔明朝","Homura Mincho","Yu Mincho","YuMincho","MS Mincho","Songti SC","STSong","STZhongsong","SimSun","宋体","Noto Serif SC",serif;
+  }
+  .lyr{
+    position:absolute;
+    max-width:min(38vw,340px);
+    line-height:1.5;letter-spacing:.15em;white-space:normal;
+    opacity:var(--o-a);
+    will-change:transform,opacity;
+    animation:
+      lyrBreath var(--bt) ease-in-out var(--bd) infinite,
+      lyrFloat  var(--ft) ease-in-out var(--fd) infinite;
+  }
+  .lyr.lg{font-size:clamp(16px,2.0vw,25px);font-weight:400}
+  .lyr.md{font-size:clamp(12.5px,1.35vw,17px);font-weight:400}
+  .lyr.sm{font-size:clamp(10.5px,1.0vw,12.5px);font-weight:400;letter-spacing:.18em}
+  /* 呼吸：由浅灰缓缓淡到看不见，再缓缓浮回来（--o-a 为静态兜底/降级时的透明度） */
+  @keyframes lyrBreath{0%,100%{opacity:0}50%{opacity:var(--o-b)}}
+  @keyframes lyrFloat{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,var(--fy),0)}}
+
+  /* ---------- 刊头 ---------- */
+  .hud{
+    position:absolute;left:0;right:0;top:0;
+    display:flex;align-items:flex-start;gap:16px;
+    padding:16px 22px 0 22px;
+    pointer-events:none;
+  }
+  .brand{position:relative;flex:0 0 auto;max-width:52vw;pointer-events:auto;cursor:help}
+  .brand h1{
+    display:flex;align-items:flex-start;
+    margin:0;
+    font-size:clamp(30px,6.2vw,72px);
+    line-height:.96;letter-spacing:-.005em;font-weight:800;
+    color:var(--ink);
+  }
+  .brand h1 > span{display:inline-block;will-change:transform}
+  .brand p{
+    display:block;
+    margin:11px 0 0;font-size:10.5px;letter-spacing:.28em;color:var(--dim);
+  }
+  /* 紫色方点改成真实元素（不再是 ::before 伪元素），才能和文字走同一条分字动效 */
+  .brand p > i.dot{
+    display:inline-block;vertical-align:middle;
+    width:7px;height:7px;margin-right:9px;
+    background:var(--lilac);
+  }
+  .brand p > span{display:inline-block}
+  .hud .gap{flex:1 1 auto;min-width:8px}
+
+  .panel{
+    background:rgba(255,255,255,.94);
+    border:1px solid var(--line);
+    pointer-events:auto;
   }
 
-  /* ---------- 光斑：只做 transform 动画，交给合成器，不触发重绘 ---------- */
-  .aurora {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    overflow: hidden;
-    contain: layout paint style;
+  /* ---------- 潮位计：一把水位尺（细线 + 刻度 + 漫上来的水痕 + 浮标） ---------- */
+  .gauge{
+    padding:8px 12px 7px;min-width:176px;cursor:ew-resize;touch-action:none;
+    transform-origin:50% 100%;                       /* 整框像浮在水上：绕底部轻轻倾侧 */
+    will-change:transform;                           /* 交给合成器，只走 translate3d/rotate */
+  }
+  .gauge.dragging{cursor:grabbing}
+  .gauge .g-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:7px}
+  .gauge .g-lab{font-size:10.5px;letter-spacing:.2em;color:var(--faint);transition:color 160ms ease}
+  .gauge .g-num b{
+    font-size:16px;font-weight:700;color:var(--ink);
+    font-variant-numeric:tabular-nums;              /* 数字跳动时不抖 */
+  }
+  .gauge .g-num span{font-size:10px;letter-spacing:.18em;color:var(--faint);margin-left:3px}
+
+  .g-track{position:relative;height:15px}
+  /* 尺身：一条细横线 */
+  .g-ruler{
+    position:absolute;left:0;right:0;top:9px;height:1px;background:var(--line);
+    transition:background-color 160ms ease;
+  }
+  /* 刻度用重复渐变画：细格每 9px，长格每 45px，不占 DOM */
+  .g-ruler::before,.g-ruler::after{content:"";position:absolute;left:0;right:0;bottom:1px}
+  .g-ruler::before{height:4px;background-image:repeating-linear-gradient(to right,rgba(16,20,24,.20) 0 1px,transparent 1px 9px)}
+  .g-ruler::after{height:7px;background-image:repeating-linear-gradient(to right,rgba(16,20,24,.32) 0 1px,transparent 1px 45px)}
+  /* 水：与主海面同一套语言 —— 紫罗兰的顶线 + 墨色等深细线。
+     外层包一层 overflow:hidden，好让水头涌起时被尺身裁住，而浮标不被裁。 */
+  .g-water{position:absolute;left:0;right:0;top:0;bottom:0;overflow:hidden;pointer-events:none}
+  /* 水痕：从低潮一侧横向漫到当前水位。等深线是水平细线，所以横向缩放不会把它拉变形 */
+  .g-fill{
+    position:absolute;left:0;top:10px;width:100%;height:5px;
+    transform-origin:0 50%;transform:scaleX(.6);
+    background-image:
+      linear-gradient(to bottom,rgba(124,58,237,.58) 0 1px,rgba(124,58,237,0) 1px),
+      repeating-linear-gradient(to bottom,rgba(16,20,24,.34) 0 1px,rgba(16,20,24,0) 1px 2px);
+    will-change:transform;
+  }
+  /* 水头：一小段正弦波边（形状静止，clip-path 裁出），只靠 translate3d / scaleY 走动与起浪 */
+  .g-wave{
+    position:absolute;left:0;top:10px;width:16px;height:5px;
+    transform-origin:0 50%;
+    background-image:linear-gradient(to bottom,rgba(124,58,237,.62),rgba(16,20,24,.42));
+    clip-path:path('M0 0 L8 0 Q11 1.25 8 2.5 Q11 3.75 8 5 L0 5 Z');
+    will-change:transform;
+  }
+  /* 浮标：一枚浮在尺上的小月盘，红点标水位 */
+  .g-mark{
+    position:absolute;left:0;top:9.5px;width:9px;height:9px;margin:-4.5px 0 0 0;
+    border-radius:50%;background:#fff;border:1px solid rgba(16,20,24,.34);
+    transition:border-color 140ms ease,box-shadow 140ms ease,scale 140ms ease-out;
+    will-change:transform;
+  }
+  .g-mark::after{
+    content:"";position:absolute;left:50%;top:50%;width:3px;height:3px;margin:-1.5px 0 0 -1.5px;
+    border-radius:50%;background:var(--red);
+  }
+  .gauge.dragging .g-mark{
+    border-color:rgba(16,20,24,.62);box-shadow:0 0 0 3px rgba(216,53,42,.09);scale:1.18;
+  }
+  @media (hover:hover) and (pointer:fine){
+    .gauge:hover .g-ruler{background:rgba(16,20,24,.26)}
+    .gauge:hover .g-lab{color:var(--dim)}
+    .gauge:hover .g-mark{border-color:rgba(16,20,24,.5)}
+  }
+  .gauge .g-ends{display:flex;justify-content:space-between;margin-top:4px;font-size:9px;letter-spacing:.2em;color:var(--faint)}
+
+  /* ---------- 站点名牌：射线尽头的名字 ---------- */
+  .ray-label{
+    --hl:var(--red);
+    position:absolute;left:0;top:0;
+    display:flex;align-items:center;gap:9px;
+    padding:3px 5px;
+    color:var(--ink);text-decoration:none;
+    pointer-events:auto;cursor:pointer;
+    will-change:transform;
+    transition:opacity .28s cubic-bezier(.22,1,.36,1),color .22s ease-out;
+  }
+  .ray-label .rl-ic{flex:0 0 auto;width:26px;height:26px;display:grid;place-items:center;color:currentColor}
+  .ray-label .rl-ic svg{width:100%;height:100%;display:block}
+  .ray-label .rl-tx{display:flex;flex-direction:column;gap:3px;min-width:0}
+  .ray-label .rl-tx b{
+    position:relative;display:block;padding-bottom:5px;
+    font-size:14px;font-weight:700;letter-spacing:.02em;
+    white-space:nowrap;transition:color .22s ease-out;
+  }
+  .ray-label .rl-tx b::after{
+    content:"";position:absolute;left:0;bottom:0;width:100%;height:1px;
+    background:var(--ink);opacity:.38;
+    transform:scaleX(.34);transform-origin:0 50%;
+    transition:transform .42s cubic-bezier(.22,1,.36,1),background .22s ease-out,opacity .22s ease-out;
+  }
+  .ray-label .rl-tx span{
+    font-size:9px;letter-spacing:.20em;text-transform:uppercase;
+    color:var(--dim);white-space:nowrap;
+    transition:color .22s ease-out;
+  }
+  /* 次池（效率工具）：短线 · 浅灰 · 刻意不明显 */
+  .ray-label.minor{--hl:var(--gray-hl);opacity:.68;color:rgba(16,20,24,.46)}
+  .ray-label.minor .rl-ic{width:18px;height:18px;color:rgba(16,20,24,.32)}
+  .ray-label.minor .rl-tx b{font-size:12px;font-weight:600}
+  .ray-label.minor .rl-tx b::after{background:rgba(16,20,24,.22);opacity:1}
+  .ray-label.minor .rl-tx span{font-size:8.5px;letter-spacing:.18em;color:rgba(16,20,24,.30)}
+
+  /* 高亮：主池红、次池宝蓝，由 --hl 分派 */
+  .ray-label.hot,
+  .ray-label.lit{color:var(--hl)}
+  .ray-label.hot .rl-tx b::after,
+  .ray-label.lit .rl-tx b::after{transform:none;background:var(--hl);opacity:1}
+  .ray-label.hot .rl-tx span,
+  .ray-label.lit .rl-tx span{color:var(--hl);opacity:.78}
+  .ray-label.hot .rl-ic,
+  .ray-label.lit .rl-ic{color:var(--hl)}
+  @media (hover:hover) and (pointer:fine){
+    .ray-label:hover{color:var(--hl);opacity:1}
+    .ray-label:hover .rl-tx b::after{transform:none;background:var(--hl);opacity:1}
+    .ray-label:hover .rl-tx span{color:var(--hl);opacity:.78}
+    .ray-label:hover .rl-ic{color:var(--hl)}
+  }
+  .ray-label:focus-visible{outline:2px solid var(--hl);outline-offset:4px}
+  .ray-label.sunk{opacity:.14}
+
+  /* ---------- 搜索：收进角落的一枚小图标 ---------- */
+  .dock{position:absolute;right:22px;bottom:20px;z-index:6;pointer-events:none}
+  .dock-btn{
+    width:38px;height:38px;display:grid;place-items:center;
+    color:var(--ink);
+    background:rgba(255,255,255,.96);
+    border:1px solid var(--line);
+    cursor:pointer;pointer-events:auto;
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1),
+               color .18s ease-out,border-color .18s ease-out,opacity .2s ease-out;
+  }
+  .dock-btn svg{width:19px;height:19px;display:block}
+  .dock-btn:hover{transform:scale(1.07);color:var(--red);border-color:rgba(216,53,42,.46)}
+  .dock-btn:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+  .dock.open .dock-btn{opacity:.6}
+
+  .dock-field{
+    position:absolute;right:calc(100% + 9px);bottom:0;
+    display:flex;align-items:center;gap:9px;
+    height:38px;padding:0 8px 0 14px;
+    background:rgba(255,255,255,.98);
+    border:1px solid var(--line);
+    pointer-events:auto;
+    visibility:hidden;opacity:0;
+    transform:translateX(16px);transform-origin:100% 50%;
+    transition:opacity .2s ease-out,transform .26s cubic-bezier(.16,1,.3,1),visibility 0s linear .26s;
+  }
+  .dock.open .dock-field{
+    visibility:visible;opacity:1;transform:none;
+    transition:opacity .2s ease-out,transform .26s cubic-bezier(.16,1,.3,1),visibility 0s;
+  }
+  .dock-field input{
+    width:190px;border:0;background:transparent;outline:none;
+    color:var(--ink);font-size:13px;font-family:inherit;letter-spacing:.02em;
+  }
+  .dock-field input::placeholder{color:var(--faint)}
+  .dock-field input::-webkit-search-cancel-button{display:none}
+  .dock-field .hint{font-size:11px;color:var(--dim);white-space:nowrap;letter-spacing:.06em}
+  .dock-x{
+    width:24px;height:24px;flex:0 0 auto;display:grid;place-items:center;
+    border:0;background:transparent;
+    color:var(--dim);line-height:1;font-family:inherit;cursor:pointer;
+    transition:color .16s ease-out;
+  }
+  .dock-x svg{width:11px;height:11px;display:block}
+  .dock-x:hover{color:var(--red)}
+
+  /* ---------- 空状态 ---------- */
+  .empty-state{
+    position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);
+    text-align:center;font-size:13px;letter-spacing:.14em;color:var(--dim);line-height:1.9;
+    padding:15px 26px;
+    background:rgba(255,255,255,.94);border:1px solid var(--line);
+    pointer-events:none;
+  }
+  .empty-state em{display:block;font-style:normal;font-size:11px;color:var(--faint);letter-spacing:.18em}
+
+  @media (max-width:760px){
+    /* 窄屏：标题与潮位计同一行（潮位计贴右上），避免再占一整行 */
+    .hud{flex-wrap:nowrap;align-items:flex-start;padding:12px 14px 0 14px;gap:8px}
+    /* 窄屏台词铺满全屏（上下都有），只收窄单行宽度 */
+    .lyr{max-width:64vw}
+    .brand{flex:1 1 auto;min-width:0;max-width:100%}
+    .brand p{letter-spacing:.18em}
+    .hud .gap{display:none}
+    .dock{right:14px;bottom:56px}
+    .dock-field input{width:112px}
+    /* 潮位计：简化成标题旁的小尺 —— 只留「潮位 + 读数 + 刻度」 */
+    .gauge{flex:0 0 auto;width:122px;min-width:0;padding:7px 9px 6px}
+    .gauge .g-top{gap:6px;margin-bottom:4px}
+    .gauge .g-lab{font-size:9.5px;letter-spacing:.08em}
+    .gauge .g-num b{font-size:12.5px}
+    .gauge .g-num span{font-size:9px;margin-left:2px}
+    .gauge .g-track{height:12px}
+    .gauge .g-ruler{top:7px}
+    .gauge .g-ruler::before{height:3px}
+    .gauge .g-ruler::after{height:5px}
+    .gauge .g-fill{top:8px;height:2px}
+    .gauge .g-mark{top:7.5px;width:7px;height:7px;margin:-3.5px 0 0 0}
+    .gauge .g-mark::after{width:2px;height:2px;margin:-1px 0 0 -1px}
+    .gauge .g-ends{display:none}
+    /* 名牌：加大点击热区，缩小图标与字号，避免窄屏挤在一起 */
+    .ray-label{padding:8px 6px;min-height:44px}
+    .ray-label .rl-ic{width:20px;height:20px}
+    .ray-label .rl-tx b{font-size:12px;padding-bottom:4px}
+    .ray-label.minor .rl-tx b{font-size:11px}
+    .ray-label.minor .rl-ic{width:16px;height:16px}
   }
 
-  .blob {
-    position: absolute;
-    border-radius: 50%;
-    opacity: 0.6;
-    transform: translateZ(0);
-    will-change: transform;
-    backface-visibility: hidden;
-    animation: drift 34s ease-in-out infinite;
-  }
-
-  /* 柔化交给渐变本身，替代 filter: blur(90px)——省掉大尺寸离屏模糊的显存与逐帧重栅格化 */
-  .blob.b1 {
-    width: 62vw; height: 62vw;
-    top: -24vw; left: -16vw;
-    background: radial-gradient(circle,
-      rgba(255, 163, 205, 0.9) 0%,
-      rgba(255, 196, 224, 0.55) 26%,
-      rgba(255, 228, 242, 0.26) 50%,
-      rgba(255, 240, 248, 0) 74%);
-  }
-
-  .blob.b2 {
-    width: 56vw; height: 56vw;
-    top: -6vw; right: -18vw;
-    animation-duration: 44s;
-    animation-delay: -12s;
-    background: radial-gradient(circle,
-      rgba(150, 195, 255, 0.85) 0%,
-      rgba(186, 216, 255, 0.5) 26%,
-      rgba(220, 236, 255, 0.22) 52%,
-      rgba(235, 245, 255, 0) 74%);
-  }
-
-  .blob.b3 {
-    width: 54vw; height: 54vw;
-    bottom: -26vw; left: 20vw;
-    animation-duration: 52s;
-    animation-delay: -26s;
-    background: radial-gradient(circle,
-      rgba(203, 176, 255, 0.75) 0%,
-      rgba(222, 204, 255, 0.45) 28%,
-      rgba(238, 230, 255, 0.2) 54%,
-      rgba(245, 240, 255, 0) 76%);
-  }
-
-  @keyframes drift {
-    0%   { transform: translate3d(0, 0, 0); }
-    50%  { transform: translate3d(3.5vw, -2.5vw, 0); }
-    100% { transform: translate3d(0, 0, 0); }
-  }
-
-  .page {
-    position: relative;
-    z-index: 2;
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 56px 24px 80px;
-  }
-
-  /* ---------- 顶部 ---------- */
-  header.top {
-    text-align: center;
-    margin-bottom: 34px;
-    animation: rise 0.8s ease both;
-  }
-
-  .clock {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 10px;
-    padding: 7px 18px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.66);
-    border: 1px solid var(--line);
-    box-shadow: var(--shadow);
-    font-size: 13px;
-    color: var(--ink-soft);
-    letter-spacing: 0.5px;
-  }
-
-  .clock #time {
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--ink);
-    font-variant-numeric: tabular-nums;
-  }
-
-  h1 {
-    margin: 22px 0 8px;
-    font-size: 40px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    background: linear-gradient(100deg, var(--pink-deep) 8%, #b493e8 48%, var(--blue-deep) 92%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
-  .subtitle {
-    margin: 0;
-    font-size: 14px;
-    color: var(--ink-soft);
-    letter-spacing: 2px;
-  }
-
-  /* ---------- 搜索 ---------- */
-  .search-wrap {
-    margin: 26px auto 0;
-    max-width: 520px;
-    position: relative;
-    animation: rise 0.8s 0.1s ease both;
-  }
-
-  .search-wrap svg {
-    position: absolute;
-    left: 20px; top: 50%;
-    transform: translateY(-50%);
-    width: 17px; height: 17px;
-    stroke: var(--ink-soft);
-    opacity: 0.75;
-    pointer-events: none;
-  }
-
-  #search {
-    width: 100%;
-    padding: 15px 22px 15px 50px;
-    border-radius: 999px;
-    border: 1px solid var(--line);
-    background: rgba(255, 255, 255, 0.8);
-    box-shadow: var(--shadow);
-    font-size: 14.5px;
-    color: var(--ink);
-    outline: none;
-    transition: box-shadow 0.25s, border-color 0.25s, background-color 0.25s;
-    font-family: inherit;
-  }
-
-  #search::placeholder { color: #a9a9c0; letter-spacing: 1px; }
-
-  #search:focus {
-    border-color: rgba(236, 111, 156, 0.5);
-    background-color: #fff;
-    box-shadow: 0 10px 30px rgba(200, 140, 190, 0.28);
-  }
-
-  /* ---------- 分类 ---------- */
-  section.cat {
-    margin-top: 46px;
-    /* 视口外的分类不参与布局/绘制，长页面滚动更省 CPU 与内存 */
-    content-visibility: auto;
-    contain-intrinsic-size: auto 340px;
-  }
-
-  .cat-head {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 18px;
-    padding-left: 24px;
-    padding-right: 24px;
-  }
-
-  .cat-head .dot {
-    width: 9px; height: 9px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--pink-deep), var(--blue-deep));
-    box-shadow: 0 0 10px rgba(236, 111, 156, 0.5);
-    flex: none;
-  }
-
-  .cat-head h2 {
-    margin: 0;
-    font-size: 16.5px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    color: #5d5d78;
-  }
-
-  .cat-head .count {
-    font-size: 12px;
-    color: #a2a2bb;
-    letter-spacing: 1px;
-  }
-
-  .cat-head .rule {
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, rgba(236, 111, 156, 0.28), rgba(111, 156, 236, 0.06));
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
-    gap: 14px;
-    padding: 0 24px;
-  }
-
-  /* ---------- 卡片 ---------- */
-  a.card {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 13px;
-    padding: 15px 17px;
-    border-radius: 18px;
-    text-decoration: none;
-    color: inherit;
-    background-color: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 5px 16px rgba(150, 158, 205, 0.12);
-    overflow: hidden;
-    transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.24s,
-      background-color 0.24s, border-color 0.24s;
-  }
-
-  a.card:hover {
-    transform: translate3d(0, -3px, 0);
-    background-color: rgba(255, 255, 255, 0.9);
-    border-color: #fff;
-    box-shadow: 0 14px 30px rgba(190, 130, 180, 0.22);
-  }
-
-  a.card:active { transform: translate3d(0, -1px, 0); }
-
-  .icon {
-    position: relative;
-    z-index: 1;
-    flex: none;
-    width: 38px; height: 38px;
-    display: grid;
-    place-items: center;
-    font-size: 19px;
-    border-radius: 12px;
-    background: linear-gradient(140deg, #ffffff, #f2eefd);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.85), 0 3px 10px rgba(150, 150, 200, 0.16);
-    cursor: zoom-in;
-    transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s;
-  }
-
-  /* 图标是「看截图」的入口，悬停时轻微放大提示可点 */
-  .icon:hover, .icon:focus-visible {
-    transform: scale(1.08);
-    box-shadow: inset 0 0 0 1px #fff, 0 6px 16px rgba(190, 130, 180, 0.3);
-    outline: none;
-  }
-
-  .meta {
-    position: relative;
-    z-index: 1;
-    min-width: 0;
-  }
-
-  .meta .name {
-    display: block;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    color: #4f4f68;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .meta .desc {
-    display: block;
-    margin-top: 2px;
-    font-size: 11.5px;
-    color: #9696ae;
-    letter-spacing: 0.3px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* ---------- 空状态 / 页脚 ---------- */
-  .empty {
-    display: none;
-    text-align: center;
-    padding: 70px 20px;
-    color: #9b9bb4;
-    font-size: 14px;
-    letter-spacing: 1px;
-  }
-
-  .empty.show { display: block; }
-
-  footer {
-    margin-top: 66px;
-    text-align: center;
-    font-size: 12px;
-    color: #a8a8c0;
-    letter-spacing: 1.5px;
-  }
-
-  /* ---------- 截图预览弹层 ---------- */
-  .shot {
-    position: fixed;
-    inset: 0;
-    z-index: 20;
-    display: grid;
-    place-items: center;
-    padding: 24px;
-  }
-
-  .shot[hidden] { display: none; }
-
-  .shot-backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(74, 74, 99, 0.3);
-    animation: fade 0.2s ease both;
-  }
-
-  .shot-box {
-    position: relative;
-    width: min(880px, 100%);
-    max-height: 100%;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    border-radius: 22px;
-    overflow: hidden;
-    background: #fff;
-    box-shadow: 0 24px 70px rgba(120, 110, 170, 0.32);
-    animation: pop 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-
-  .shot-bar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px 10px 18px;
-    background: linear-gradient(100deg, #fdf1f7, #eef3ff);
-  }
-
-  .shot-title {
-    flex: 1;
-    min-width: 0;
-    font-size: 13.5px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    color: #4f4f68;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .shot-open, .shot-close {
-    flex: none;
-    border: 0;
-    font-family: inherit;
-    cursor: pointer;
-  }
-
-  .shot-open {
-    padding: 7px 15px;
-    border-radius: 999px;
-    font-size: 12.5px;
-    letter-spacing: 1px;
-    color: #fff;
-    background: linear-gradient(120deg, var(--pink-deep), var(--blue-deep));
-    box-shadow: 0 4px 12px rgba(180, 130, 200, 0.34);
-  }
-
-  .shot-open:hover { box-shadow: 0 7px 18px rgba(180, 130, 200, 0.44); }
-
-  .shot-close {
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    font-size: 17px;
-    line-height: 1;
-    color: #8a8aa4;
-    background: rgba(255, 255, 255, 0.85);
-  }
-
-  .shot-close:hover { color: var(--pink-deep); background: #fff; }
-
-  .shot-body {
-    position: relative;
-    aspect-ratio: 3 / 2;
-    max-height: 64vh;
-    background: #f7f5fb;
-  }
-
-  .shot-body img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top center;
-    background: #f7f5fb;
-  }
-
-  .shot-tip {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    padding: 24px;
-    text-align: center;
-    font-size: 13px;
-    line-height: 1.8;
-    letter-spacing: 1px;
-    color: #9b9bb4;
-  }
-
-  .shot-tip.hide { display: none; }
-
-  @keyframes fade {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-
-  @keyframes pop {
-    from { opacity: 0; transform: translate3d(0, 16px, 0) scale(0.98); }
-    to   { opacity: 1; transform: none; }
-  }
-
-  @keyframes rise {
-    from { opacity: 0; transform: translateY(14px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  @media (max-width: 640px) {
-    .page { padding: 38px 14px 60px; }
-    h1 { font-size: 30px; letter-spacing: 2px; }
-    .grid { padding: 0 10px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 11px; }
-    .cat-head { padding-left: 10px; padding-right: 10px; }
-    .icon { width: 34px; height: 34px; font-size: 17px; }
-    .shot { padding: 12px; }
-    .shot-box { border-radius: 18px; }
-    .shot-bar { padding: 9px 10px 9px 14px; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .blob { animation: none; }
-    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{
+      animation-duration:.01ms !important;
+      animation-iteration-count:1 !important;
+      transition-duration:.01ms !important;
+    }
   }
 </style>
 </head>
 <body>
 
-<div id="bg"></div>
-<div class="aurora">
-  <div class="blob b1"></div>
-  <div class="blob b2"></div>
-  <div class="blob b3"></div>
-</div>
+<div id="lyrics" aria-hidden="true"></div>
 
-<div class="page">
+<canvas id="sea" aria-hidden="true"></canvas>
 
-  <header class="top">
-    <div class="clock">
-      <span id="greet">你好</span>
-      <span id="time">--:--</span>
-      <span id="date">--</span>
+<div id="deck">
+  <div id="dust" aria-hidden="true"></div>
+
+  <header class="hud">
+    <div class="brand" id="brand">
+      <h1>月与海</h1>
+      <p>就像那悬挂在澄澈原野上空的苍蓝之月一样</p>
     </div>
-    <h1>导航台</h1>
-    <p class="subtitle">一个把常用网站收在一起的温柔角落</p>
+    <div class="gap"></div>
 
-    <div class="search-wrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
-        <circle cx="11" cy="11" r="7"></circle>
-        <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
-      </svg>
-      <input id="search" type="text" placeholder="搜索网站、分类或关键词…" autocomplete="off">
+    <div class="panel gauge" aria-label="潮位计">
+      <div class="g-top">
+        <span class="g-lab">潮位</span>
+        <span class="g-num"><b id="tideNum">0.62</b><span>m</span></span>
+      </div>
+      <div class="g-track" id="gTrack">
+        <i class="g-ruler" aria-hidden="true"></i>
+        <span class="g-water" aria-hidden="true">
+          <i class="g-fill" id="gFill"></i>
+          <i class="g-wave" id="gWave"></i>
+        </span>
+        <i class="g-mark" id="gMark"></i>
+      </div>
+      <div class="g-ends"><span>低潮</span><span>高潮</span></div>
     </div>
   </header>
 
-  <main id="content"></main>
+  <div class="empty-state" id="emptyState" hidden>
+    这片海面没有这样的站点
+    <em>换个词试试，或按 Esc 清空搜索</em>
+  </div>
 
-  <div class="empty" id="empty">没有找到相关网站，换个关键词试试吧 ~</div>
-
-  <footer>共 <span id="total">0</span> 个站点 · 点卡片打开 · 点图标看截图</footer>
-</div>
-
-<div class="shot" id="shot" hidden>
-  <div class="shot-backdrop" data-close></div>
-  <figure class="shot-box" role="dialog" aria-modal="true" aria-label="网站截图预览">
-    <div class="shot-bar">
-      <span class="shot-title" id="shotTitle">预览</span>
-      <button class="shot-open" id="shotOpen" type="button">打开网站</button>
-      <button class="shot-close" id="shotClose" type="button" aria-label="关闭">&#x2715;</button>
+  <div class="dock" id="dock">
+    <div class="dock-field" id="searchField">
+      <input id="search" type="search" inputmode="search" placeholder="搜一搜：月巴 / 排版 / ACG" aria-label="搜索站点" autocomplete="off" />
+      <span class="hint" id="hint"></span>
+      <button class="dock-x" id="searchClose" type="button" aria-label="关闭搜索"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </div>
-    <div class="shot-body">
-      <img id="shotImg" alt="网站截图" decoding="async">
-      <div class="shot-tip" id="shotTip">截图加载中…</div>
-    </div>
-  </figure>
+    <button class="dock-btn" id="searchToggle" type="button" aria-label="搜索站点" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.2"/><path d="M15.3 15.3 20 20"/></svg></button>
+  </div>
 </div>
 
 <script>
-const DATA = [
-  {
-    cat: "月与海（小游戏）",
-    sites: [
-      { icon: "&#x1F319;", name: "月巴放置", url: "https://lll166.github.io/yuebafangzhi/", desc: "放置小游戏", keys: "月巴放置 放置 小游戏 月与海 yuebafangzhi" },
-      { icon: "&#x1F3B2;", name: "月了个巴", url: "https://lll166.github.io/yuelegeba/", desc: "休闲小游戏", keys: "月了个巴 小游戏 月与海 yuelegeba" },
-      { icon: "&#x1F349;", name: "合成大月巴", url: "https://lll166.github.io/Bigyueba/", desc: "合成小游戏", keys: "合成大月巴 合成 小游戏 月与海 Bigyueba" }
-    ]
-  },
-  {
-    cat: "效率工具",
-    sites: [
-      { icon: "&#x1F3AA;", name: "漫展菜单", url: "https://lll166.github.io/ACGMenu/", desc: "漫展活动菜单", keys: "漫展菜单 漫展 ACG 活动 菜单 效率 工具 ACGMenu" },
-      { icon: "&#x1F4CA;", name: "词频自查", url: "https://lll166.github.io/cipin/", desc: "文本词频统计", keys: "词频自查 词频 统计 文本 写作 效率 工具 cipin" },
-      { icon: "&#x1F4DD;", name: "文章排版", url: "https://lll166.github.io/wenzhang/", desc: "文章排版工具", keys: "文章排版 排版 编辑器 效率 工具 wenzhang" }
-    ]
-  }
-];
+(function(){
+  "use strict";
 
-const content = document.getElementById("content");
-const totalEl = document.getElementById("total");
-const emptyEl = document.getElementById("empty");
-const searchEl = document.getElementById("search");
+  /* ================= 数据 ================= */
+  const SVG_OPEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+  const I = {
+    /* 月相：暗部用 30% 线稿月盘，受光部用 currentColor 实心填充。
+       按「娥眉 → 上弦 → 盈凸 → 满 → 亏凸 → 下弦 → 残 → 新月」递进，
+       顺序见 PHASES —— 图标跟着站点在扇面上的次序走，不跟名字走。 */
+    crescent: SVG_OPEN + '<circle cx="12" cy="12" r="8" opacity=".3"/><path d="M12 4A8 8 0 0 1 12 20A10 10 0 0 0 12 4Z" fill="currentColor" stroke="none"/></svg>',
+    quarter:  SVG_OPEN + '<circle cx="12" cy="12" r="8" opacity=".3"/><path d="M12 4A8 8 0 0 1 12 20Z" fill="currentColor" stroke="none"/></svg>',
+    gibbous:  SVG_OPEN + '<circle cx="12" cy="12" r="8" opacity=".3"/><path d="M12 4A8 8 0 0 1 12 20A10 10 0 0 1 12 4Z" fill="currentColor" stroke="none"/></svg>',
+    full:     SVG_OPEN + '<circle cx="12" cy="12" r="8" fill="currentColor" stroke="none"/></svg>',
+    wanGib:   SVG_OPEN + '<circle cx="12" cy="12" r="8" opacity=".3"/><path d="M12 4A8 8 0 0 0 12 20A10 10 0 0 0 12 4Z" fill="currentColor" stroke="none"/></svg>',
+    lastQ:    SVG_OPEN + '<circle cx="12" cy="12" r="8" opacity=".3"/><path d="M12 4A8 8 0 0 0 12 20Z" fill="currentColor" stroke="none"/></svg>',
+    wanCres:  SVG_OPEN + '<circle cx="12" cy="12" r="8" opacity=".3"/><path d="M12 4A8 8 0 0 0 12 20A10 10 0 0 1 12 4Z" fill="currentColor" stroke="none"/></svg>',
+    newMoon:  SVG_OPEN + '<circle cx="12" cy="12" r="8" opacity=".3"/><path d="M18.6 8.6a8 8 0 0 1 0 6.8" opacity=".45"/></svg>',
+    menu:  SVG_OPEN + '<path d="M4 6.5h16M4 12h16M4 17.5h10"/></svg>',
+    chart: SVG_OPEN + '<path d="M4 20h16"/><path d="M7.5 20v-6.5M12 20V8.5M16.5 20V4.5"/></svg>',
+    type:  SVG_OPEN + '<path d="M5 5.5h14M5 10h14M5 14.5h14M5 19h8"/></svg>'
+  };
+  /* 一个完整月相序列：站点按次序取，中间插入新站时后面依次顺延，保持递进 */
+  const PHASES = [I.crescent, I.quarter, I.gibbous, I.full, I.wanGib, I.lastQ, I.wanCres, I.newMoon];
 
-let total = 0;
-
-DATA.forEach(section => {
-  const el = document.createElement("section");
-  el.className = "cat";
-  el.dataset.cat = section.cat;
-
-  const cards = section.sites.map(s => {
-    total++;
-    return `<a class="card" href="${s.url}" target="_blank" rel="noopener noreferrer"
-      data-key="${(s.name + " " + s.desc + " " + s.keys + " " + section.cat).toLowerCase()}">
-      <span class="icon" role="button" tabindex="0" aria-label="预览 ${s.name} 的截图"
-        data-url="${s.url}" data-name="${s.name}">${s.icon}</span>
-      <span class="meta">
-        <span class="name">${s.name}</span>
-        <span class="desc">${s.desc}</span>
-      </span>
-    </a>`;
-  }).join("");
-
-  el.innerHTML = `
-    <div class="cat-head">
-      <span class="dot"></span>
-      <h2>${section.cat}</h2>
-      <span class="count">${section.sites.length}</span>
-      <span class="rule"></span>
-    </div>
-    <div class="grid">${cards}</div>`;
-
-  content.appendChild(el);
-});
-
-totalEl.textContent = total;
-
-/* 只取一次 DOM，搜索时不再重复查询 */
-const sections = Array.from(document.querySelectorAll("section.cat"));
-const cardsOf = sections.map(sec => [sec, Array.from(sec.querySelectorAll("a.card"))]);
-
-/* 搜索过滤 */
-searchEl.addEventListener("input", () => {
-  const q = searchEl.value.trim().toLowerCase();
-  let visible = 0;
-
-  for (const [sec, cards] of cardsOf) {
-    let secCount = 0;
-    for (const card of cards) {
-      const hit = !q || card.dataset.key.includes(q);
-      card.style.display = hit ? "" : "none";
-      if (hit) secCount++;
+  const DATA = [
+    {
+      cat: "月与海（小游戏）",
+      icons: PHASES,          /* 图标取自序列，按站点在扇面上的先后顺序分配 */
+      sites: [
+        { name: "月了个巴", url: "https://lll166.github.io/yuelegeba/", desc: "Casual Game", keys: "月了个巴 小游戏 月与海 yuelegeba Casual Game" },
+        { name: "月巴放置", url: "https://lll166.github.io/yuebafangzhi/", desc: "Idle Game", keys: "月巴放置 放置 小游戏 月与海 yuebafangzhi Idle Game" },
+        { name: "合成大月巴", url: "https://lll166.github.io/Bigyueba/", desc: "Merge Game", keys: "合成大月巴 合成 小游戏 月与海 Bigyueba Merge Game" }
+      ]
+    },
+    {
+      cat: "效率工具",
+      sites: [
+        { icon: I.menu, name: "漫展菜单", url: "https://lll166.github.io/ACGMenu/", desc: "漫展活动菜单", keys: "漫展菜单 漫展 ACG 活动 菜单 效率 工具 ACGMenu" },
+        { icon: I.chart, name: "词频自查", url: "https://lll166.github.io/cipin/", desc: "文本词频统计", keys: "词频自查 词频 统计 文本 写作 效率 工具 cipin" },
+        { icon: I.type, name: "文章排版", url: "https://lll166.github.io/wenzhang/", desc: "文章排版工具", keys: "文章排版 排版 编辑器 效率 工具 wenzhang" }
+      ]
     }
-    sec.style.display = secCount ? "" : "none";
-    visible += secCount;
+  ];
+
+  /* ================= 背景台词（浅灰 · 呼吸 · 浮动 · 轮播） =================
+     13 个槽位固定不动（位置/字号/呼吸与浮动节奏都按下面的排布参数），台词在其中轮播：
+     每句在自己的呼吸淡到「完全看不见」的那一刻换成下一句，于是看到的是缓缓淡入的新句子。
+     每槽各自独立的呼吸/浮动时长，用负 delay 错开相位，永不齐步。只走 transform / opacity。 */
+  const LYRIC_POOL = [
+    '在最后的最后……我还是觉得你……',
+    '讨厌死了讨厌死了讨厌死了……',
+    '但又……最喜欢你了。',
+    '这是用来引爆我体内那颗炸弹的装置。',
+    '只要轻轻按下这个按钮，我就会立刻被炸得粉身碎骨哦。',
+    '反正就算你拒绝，我也会跟着你哦。',
+    '我会循着气味，跟你到天涯海角。',
+    '别害羞嘛……',
+    '我对你的爱，可是已经溢满成灾了哦？',
+    '你能不能牵着我的手，带我过去？来吧，我们是互相扶持的同伴哦。',
+    'Love&Peace!',
+    '就此别过啦，"挚友"。',
+    '拓海同学，你真的很美啊……',
+    '能像这样和你在一起，我好幸福……',
+    '我爱你，拓海同学……',
+    '永远喜欢你，拓海同学。',
+    '很遗憾……我并不想和拓海同学以外的人产生接触。',
+    '就像那悬挂在澄澈原野上空的苍蓝之月……一样。',
+    '而是拓海同学看上去像是……从冰箱里面翻出来的烂圣女果……',
+    '因为我对你的兴趣，超越了对你的厌恶感。',
+    '现在这一瞬间……这里就是只属于你我两个人的世界！',
+    '我……做错了什么吗？不，你什么都没做错。拓海同学是没有任何错的。',
+    '再见啦……拓海同学……',
+    '活了这么多年……和你的死斗……是唯一让我感到快乐的事情哦。',
+    '我还想多玩弄玩弄澄野同学呢！',
+    '只因为救过我，就洋洋得意的拓海同学，只有他，我实在讨厌得忍无可忍。'
+  ];
+
+  /* 排布槽位：位置 / 字号档位 / 颜色 / 呼吸与浮动参数（句数即槽位数） */
+  const LYRIC_SLOTS = [
+    { c:'#b7bdc5', s:'md', x:33, y:11, oa:.20, ob:.40, bt:9,   bd:0,   ft:13,   fd:0,   fy:-14 },
+    { c:'#adb3bb', s:'sm', x:13, y:19, oa:.16, ob:.34, bt:11,  bd:2.4, ft:16,   fd:3.1, fy:12  },
+    { c:'#a4aab2', s:'md', x:55, y:22, oa:.18, ob:.38, bt:8,   bd:1.2, ft:12,   fd:5,   fy:-11 },
+    { c:'#bcc2c9', s:'sm', x:75, y:7,  oa:.14, ob:.30, bt:12,  bd:3,   ft:15,   fd:1.5, fy:10  },
+    { c:'#c2c8cf', s:'sm', x:71, y:15, oa:.13, ob:.28, bt:10,  bd:4.2, ft:14,   fd:2.2, fy:-9  },
+    { c:'#a6acb4', s:'sm', x:5,  y:31, oa:.16, ob:.34, bt:13,  bd:1.8, ft:17,   fd:4.4, fy:13  },
+    { c:'#9ba2ab', s:'md', x:6,  y:44, oa:.18, ob:.38, bt:9,   bd:.6,  ft:13,   fd:6.2, fy:-12 },
+    { c:'#949ba4', s:'md', x:37, y:49, oa:.20, ob:.42, bt:8.5, bd:2.9, ft:12.5, fd:1.1, fy:12  },
+    { c:'#a9afb7', s:'sm', x:28, y:61, oa:.15, ob:.32, bt:12,  bd:3.6, ft:16,   fd:2.8, fy:-10 },
+    { c:'#9aa1a9', s:'lg', x:5,  y:69, oa:.17, ob:.36, bt:10,  bd:1.4, ft:14,   fd:3.7, fy:14  },
+    { c:'#b0b6be', s:'sm', x:66, y:66, oa:.15, ob:.32, bt:11,  bd:4.8, ft:15,   fd:.9,  fy:-13 },
+    { c:'#a0a7b0', s:'md', x:45, y:81, oa:.18, ob:.38, bt:9,   bd:.3,  ft:13,   fd:5.6, fy:11  },
+    { c:'#b7bdc5', s:'sm', x:63, y:86, oa:.14, ob:.30, bt:12,  bd:2.1, ft:16,   fd:4.1, fy:-9  }
+  ];
+
+  /* 洗牌袋：一整轮抽完才会重复，避免同一句反复出现 */
+  let lyricBag = [];
+  function nextLyric(last){
+    if (!lyricBag.length){
+      lyricBag = LYRIC_POOL.slice();
+      for (let i = lyricBag.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = lyricBag[i]; lyricBag[i] = lyricBag[j]; lyricBag[j] = tmp;
+      }
+    }
+    let s = lyricBag.pop();
+    if (s === last && lyricBag.length){
+      lyricBag.unshift(s);
+      s = lyricBag.pop();
+    }
+    return s;
   }
 
-  emptyEl.classList.toggle("show", visible === 0);
-});
-
-/* ---------- 截图预览：点图标看截图，点卡片仍然直接打开 ---------- */
-const shotEl = document.getElementById("shot");
-const shotImg = document.getElementById("shotImg");
-const shotTip = document.getElementById("shotTip");
-const shotTitle = document.getElementById("shotTitle");
-const shotOpen = document.getElementById("shotOpen");
-const shotClose = document.getElementById("shotClose");
-
-let shotUrl = "";
-
-/* 主用 thum.io 实时截图，失败回退 microlink */
-const shotSrc = u => "https://image.thum.io/get/width/1200/crop/800/noanimate/" + u;
-const shotFallback = u => "https://api.microlink.io/?url=" + encodeURIComponent(u) +
-  "&screenshot=true&meta=false&viewport.width=1200&embed=screenshot.url";
-
-function openShot(url, name) {
-  shotUrl = url;
-  shotTitle.textContent = name;
-  shotTip.textContent = "截图加载中…";
-  shotTip.classList.remove("hide");
-  shotImg.dataset.step = "0";
-  shotImg.src = shotSrc(url);
-  shotEl.hidden = false;
-}
-
-function closeShot() {
-  shotEl.hidden = true;
-  shotImg.removeAttribute("src"); /* 断开未完成的请求，不占用内存 */
-}
-
-shotImg.addEventListener("load", () => shotTip.classList.add("hide"));
-
-shotImg.addEventListener("error", () => {
-  if (shotEl.hidden) return; /* 关闭弹层时清空 src 触发的 error，忽略 */
-  if (shotImg.dataset.step === "0") {
-    shotImg.dataset.step = "1";
-    shotImg.src = shotFallback(shotUrl);
-  } else {
-    shotTip.textContent = "截图暂时加载不出来，点右上角「打开网站」直接访问吧 ~";
+  /* 轮播：每槽在自己的「淡出到 0」那一刻换词；下一圈用绝对时间重算，不累积定时器误差；
+     后台节流错过边界就等下一圈，避免在可见时换词 */
+  function rotateLyrics(slots){
+    if (reduced) return;
+    const t0 = performance.now();
+    function schedule(sl){
+      const cycle = sl.bt * 1000;
+      const off = sl.bd * 1000;            /* CSS 里是 animation-delay:-bd s，故本地时间 = (t - start) + bd */
+      const now = performance.now();
+      const k = Math.ceil((now - t0 + off) / cycle);
+      let at = t0 + k * cycle - off;
+      if (at - now < 60) at += cycle;
+      setTimeout(function(){
+        if (reduced) return;
+        const ph = (performance.now() - t0 + off) % cycle;   /* 0 ≈ 呼吸的最低点 */
+        if (ph > 120 && ph < cycle - 120){ schedule(sl); return; }
+        sl.el.textContent = nextLyric(sl.el.textContent);
+        schedule(sl);
+      }, Math.max(0, at - now));
+    }
+    slots.forEach(schedule);
   }
-});
 
-/* 事件委托：卡片是 innerHTML 生成的，不必逐个绑定 */
-content.addEventListener("click", e => {
-  const icon = e.target.closest(".icon");
-  if (!icon) return;
-  e.preventDefault(); /* 拦住卡片本身的跳转 */
-  openShot(icon.dataset.url, icon.dataset.name);
-});
+  function buildLyrics(){
+    const host = document.getElementById('lyrics');
+    if (!host) return;
+    const slots = [];
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < LYRIC_SLOTS.length; i++){
+      const L = LYRIC_SLOTS[i];
+      const s = document.createElement('span');
+      s.className = 'lyr ' + L.s;
+      s.textContent = nextLyric('');
+      s.style.left = L.x + '%';
+      s.style.top = L.y + '%';
+      s.style.color = L.c;
+      s.style.setProperty('--o-a', L.oa);
+      s.style.setProperty('--o-b', L.ob);
+      s.style.setProperty('--bt', L.bt + 's');
+      s.style.setProperty('--bd', (-L.bd) + 's');
+      s.style.setProperty('--ft', L.ft + 's');
+      s.style.setProperty('--fd', (-L.fd) + 's');
+      s.style.setProperty('--fy', L.fy + 'px');
+      frag.appendChild(s);
+      slots.push({ el: s, bt: L.bt, bd: L.bd });
+    }
+    host.appendChild(frag);
+    rotateLyrics(slots);
+  }
 
-content.addEventListener("keydown", e => {
-  const icon = e.target.closest(".icon");
-  if (!icon || (e.key !== "Enter" && e.key !== " ")) return;
-  e.preventDefault();
-  openShot(icon.dataset.url, icon.dataset.name);
-});
+  /* ================= 常量与工具 ================= */
+  const TAU = Math.PI * 2;
+  const RAD = Math.PI / 180;
+  /* NaN 安全：非有限数（NaN）一律夹到下界 a，±∞ 夹到边界 */
+  const clamp = (v, a, b) => Number.isNaN(v) ? a : (v < a ? a : (v > b ? b : v));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  /* 指数逼近；非有限数不会永久污染弹簧（自愈），dt<=0 视为本帧不动 */
+  const follow = (x, target, k, dt) => {
+    if (!isFinite(x)) x = isFinite(target) ? target : 0;
+    if (!isFinite(target)) return x;
+    const d = (isFinite(dt) && dt > 0) ? dt : 0;
+    return x + (target - x) * (1 - Math.exp(-k * d));
+  };
 
-shotClose.addEventListener("click", closeShot);
-document.querySelector(".shot-backdrop").addEventListener("click", closeShot);
-shotOpen.addEventListener("click", () => window.open(shotUrl, "_blank", "noopener"));
+  /* 二阶弹簧阻尼：vel += (target-x)*k*dt; vel *= d^(dt*60); x += vel*dt */
+  function Spring(x, k, d){ this.x = x; this.v = 0; this.t = x; this.k = k; this.d = d; }
+  Spring.prototype.step = function(dt){
+    this.v += (this.t - this.x) * this.k * dt;
+    this.v *= Math.pow(this.d, dt * 60);
+    this.x += this.v * dt;
+  };
 
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape" && !shotEl.hidden) closeShot();
-});
+  /* ================= DOM ================= */
+  const canvas = document.getElementById('sea');
+  const ctx = canvas.getContext('2d');   /* 透明画布：台词层在它下方，月亮与海画在它之上 */
+  const deck = document.getElementById('deck');
+  const dust = document.getElementById('dust');
+  const brand = document.getElementById('brand');
+  const emptyState = document.getElementById('emptyState');
+  const searchEl = document.getElementById('search');
+  const hintEl = document.getElementById('hint');
+  const dock = document.getElementById('dock');
+  const searchToggle = document.getElementById('searchToggle');
+  const searchClose = document.getElementById('searchClose');
+  const tideNumEl = document.getElementById('tideNum');
+  const gTrack = document.getElementById('gTrack');
+  const gFill = document.getElementById('gFill');
+  const gWave = document.getElementById('gWave');
+  const gMark = document.getElementById('gMark');
+  const gaugeEl = gTrack.closest('.gauge');
 
-/* 时钟与问候 */
-const greetEl = document.getElementById("greet");
-const timeEl = document.getElementById("time");
-const dateEl = document.getElementById("date");
-const weekdays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+  /* ================= 状态 ================= */
+  const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let reduced = mqReduce.matches;
 
-function tick() {
-  const now = new Date();
-  const h = now.getHours();
-  greetEl.textContent = h < 6 ? "夜深了" : h < 11 ? "早上好" : h < 14 ? "中午好" : h < 18 ? "下午好" : h < 23 ? "晚上好" : "夜深了";
-  timeEl.textContent = String(h).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
-  dateEl.textContent = `${now.getMonth() + 1}月${now.getDate()}日 ${weekdays[now.getDay()]}`;
-}
+  let W = 1280, H = 800, DPR = 1;
+  let waterY = 0;
+  let tide = 0.62;
+  let hMoon = 0.62, hMoonTarget = 0.62;
+  /* 海水开场：只做一件事 —— 整幅水线一起从屏幕下方沿缓动慢慢涨到静水线。
+     单段、无横向成分、无末端过冲；涨完那一刻精确等于静水线，所以没有跳变。
+     双击月亮仍是整片放干 / 重新灌满，不重播开场。 */
+  let seaOn = true;
+  let introT = 0;                 /* 开场计时（秒） */
+  let introDone = false;
+  const INTRO_RISE = 3.0;        /* 从屏幕下方缓慢涨到静水线所需时长（秒） */
+  const INTRO_SINK = 40;         /* 起点：静水线再往下这么多像素，确保开场时完全在视口之外 */
+  const INTRO_END = INTRO_RISE;  /* 涨满即结束 */
+  const easeInOutCubic = p => p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+  let moonX = 0, moonY = 0, moonR = 60;
+  /* 月心（射线束的原点） */
+  const cen = { x: 0, y: 0, r: 60 };
 
-tick();
-/* 对齐整分钟唤醒，避免每秒一次的定时器开销 */
-(function loop() {
-  setTimeout(() => { tick(); loop(); }, 60000 - (Date.now() % 60000) + 50);
+  /* 月亮轨道：桌面走左上弧，窄屏居中走顶部弧（由 updateArc 按断点赋值） */
+  let arcCx = 0, arcCy = 0, arcR = 0, arcA0 = 0.20, arcA1 = 1.05;
+
+  /* 射线束：6 条线均分下半扇面，可从 -LIM 转到 +LIM */
+  let FAN_A0 = 40, FAN_SPREAD = 100;
+  const FAN_LIM = 26;
+  let FAN_STEP = 20;
+  const fan = new Spring(0, 44, 0.86);   /* 弧度之外的整数：角度(°) */
+
+  /* 射线落点的内缩矩形（也是名牌中心所落的边界） */
+  let EX0 = 110, EX1 = 1170, EY0 = 130, EY1 = 700;
+  let EDGE = 74;          /* 名牌中心与左右屏幕边的安全距离 */
+  let LABEL_GAP = 118;    /* 名牌之间的最小中心距（窄屏收紧，避免叠字） */
+  let LABEL_ITER = 2;     /* 名牌互斥的迭代轮数（窄屏多加一轮） */
+  let TILT_MAX = 56;      /* 名牌最大倾斜角（窄屏收小，保证可读） */
+
+  const mouse = { x: 0, y: 0, px: 0, py: 0, svx: 0, svy: 0, speed: 0, dragMoon: false, dragTide: false, cursor: '', seen: false, overUI: false, overGauge: false };
+  let lastPY = -1;
+  let hoverIdx = -1;
+
+  const rot = { active: false, sx: 0, start: 0, lx: 0, lt: 0, v: 0, moved: 0 };
+  let wheelAcc = 0, wheelLock = 0;
+
+  const cards = [];
+  const craters = [
+    { dx: -0.34, dy: -0.26, r: 0.17 },
+    { dx: 0.22,  dy: -0.36, r: 0.11 },
+    { dx: -0.10, dy: 0.20,  r: 0.22 },
+    { dx: 0.36,  dy: 0.26,  r: 0.09 },
+    { dx: -0.46, dy: 0.42,  r: 0.07 }
+  ];
+
+  const starJ = new Spring(0, 46, 0.90);
+  let gaugeW = 160, markW = 9;
+  /* 尺上水痕的惯性：水位变化越快它越晃，松手后靠阻尼余摆慢慢平复（角度） */
+  const slosh = new Spring(0, 46, 0.90);
+  /* 潮位计整框（一枚浮标）的三个自由度：横漂 / 浮沉 / 倾侧，各自一条二阶弹簧 */
+  const gaugeX = new Spring(0, 52, 0.88);
+  const gaugeY = new Spring(0, 38, 0.87);
+  const gaugeR = new Spring(0, 58, 0.85);
+  let lastTide = 0.62;
+  let snapFan = true;      /* 布局变化后让扇面直接落位，别从旧角度扫一遍 */
+
+  /* 水面质点链 */
+  const RIPPLE_N = 64;
+  let spacing = 20;
+  let rd = null, rv = null;
+
+  /* 水面采样缓存（轮廓线共用同一条波） */
+  const WSTEP = 24;
+  let waveN = 0;
+  let waveBuf = null;
+
+  /* ================= 刊头动效（标题 · 副标题） =================
+     三层叠加：入场弹簧错峰落位 → 各自频率的慢涌呼吸 → 指针速度驱动的整排倾斜。
+     全部只走 transform / opacity，且入场结束后自动停机。 */
+  const typeLean = new Spring(0, 58, 0.90);
+  const titleG = [], subG = [];
+
+  function glyphOf(el, i, startY, step, withLift){
+    return {
+      el: el, i: i, tx: 0, ty: 0, done: false, cx: 0, cy: 0,
+      startY: startY,
+      delay: 130 + i * step,
+      eny: new Spring(startY, 52, 0.80),
+      lift: withLift ? new Spring(0, 72, 0.90) : null
+    };
+  }
+
+  /* lead：可选的前导元素（副标题的紫色方点），排在第 0 位，与文字共用同一条错峰波 */
+  function splitGlyphs(el, bag, startY, step, withLift, lead){
+    const text = el.textContent;
+    el.textContent = '';
+    let i = 0;
+    if (lead){
+      el.appendChild(lead);
+      bag.push(glyphOf(lead, 0, startY, step, withLift));
+      i = 1;
+    }
+    for (let k = 0; k < text.length; k++){
+      const raw = text.charAt(k);
+      const s = document.createElement('span');
+      s.textContent = raw === ' ' ? '\u00A0' : raw;
+      el.appendChild(s);
+      bag.push(glyphOf(s, i, startY, step, withLift));
+      i++;
+    }
+  }
+
+  function buildType(){
+    splitGlyphs(brand.querySelector('h1'), titleG, 64, 82, true, null);
+    const dot = document.createElement('i');
+    dot.className = 'dot';
+    splitGlyphs(brand.querySelector('p'), subG, 26, 34, false, dot);
+  }
+
+  /* 记下每个字的自然中心（扣掉当前平移；旋转绕中心，不动中心） */
+  function measureType(){
+    for (let i = 0; i < titleG.length; i++){
+      const g = titleG[i];
+      const r = g.el.getBoundingClientRect();
+      g.cx = r.left + r.width / 2 - g.tx;
+      g.cy = r.top + r.height / 2 - g.ty;
+    }
+  }
+
+  /* reduced motion：一切归位，不写任何内联样式 */
+  function resetType(){
+    const all = titleG.concat(subG);
+    for (let i = 0; i < all.length; i++){
+      const g = all[i];
+      g.eny.x = 0; g.eny.v = 0; g.eny.t = 0; g.done = true;
+      g.tx = 0; g.ty = 0;
+      if (g.lift){ g.lift.x = 0; g.lift.v = 0; g.lift.t = 0; }
+      g.el.style.transform = '';
+      g.el.style.opacity = '';
+    }
+  }
+
+  function stepEntrance(g, dt, now){
+    if (g.done) return;
+    if (now - t0 >= g.delay) g.eny.t = 0;
+    g.eny.step(dt);
+    if (g.eny.t === 0 && Math.abs(g.eny.x) < 0.3 && Math.abs(g.eny.v) < 3){
+      g.eny.x = 0; g.eny.v = 0; g.done = true;
+      g.el.style.opacity = '';
+    } else {
+      g.el.style.opacity = clamp(1 - g.eny.x / g.startY, 0, 1).toFixed(3);
+    }
+  }
+
+  function updateType(dt, t, now){
+    /* §4 次生运动：指针速度灌进一条松弹簧，整排字随之倾斜，松手余振自然衰减 */
+    typeLean.t = clamp(mouse.svx * 0.0040, -1.7, 1.7);
+    typeLean.step(dt);
+    const lean = typeLean.x;
+    const ph = t * TAU;
+
+    for (let i = 0; i < titleG.length; i++){
+      const g = titleG[i];
+      stepEntrance(g, dt, now);
+      /* §7 追随：指针靠近时被月光轻轻托起，落点必须停住 */
+      const d = Math.hypot(mouse.x - g.cx, mouse.y - g.cy);
+      g.lift.t = mouse.seen ? clamp(1 - d / 260, 0, 1) * 4.4 : 0;
+      g.lift.step(dt);
+      const fx = Math.sin(ph * 0.083 + i * 1.41) * 1.1 + lean * 1.5;
+      const fy = g.eny.x + Math.sin(ph * 0.112 + i * 0.92) * 1.9 - g.lift.x;
+      const rt = Math.sin(ph * 0.069 + i) * 0.95 + lean * 0.55;
+      g.tx = fx; g.ty = fy;
+      g.el.style.transform =
+        'translate3d(' + fx.toFixed(2) + 'px,' + fy.toFixed(2) + 'px,0) rotate(' + rt.toFixed(2) + 'deg)';
+    }
+
+    for (let i = 0; i < subG.length; i++){
+      const g = subG[i];
+      stepEntrance(g, dt, now);
+      /* 一道横波从左侧穿过整排副标题 */
+      const p2 = ph - i * 0.44;
+      const fx = Math.sin(p2 * 0.115 + 1.2) * 0.9 + lean * (1.1 + i * 0.035);
+      const fy = g.eny.x + Math.sin(p2 * 0.16) * 1.7;
+      const rt = Math.sin(p2 * 0.09 + 0.5) * 1.05 + lean * 0.32;
+      g.tx = fx; g.ty = fy;
+      g.el.style.transform =
+        'translate3d(' + fx.toFixed(2) + 'px,' + fy.toFixed(2) + 'px,0) rotate(' + rt.toFixed(2) + 'deg)';
+    }
+  }
+
+  /* ================= 布局 ================= */
+  /* 月亮轨道参数：桌面走左上弧；窄屏取圆上近「正右侧」的一段——
+     这段切线接近竖直，所以潮位变化主要体现为月亮的高低落差，横向漂移很小 */
+  function updateArc(narrow){
+    if (narrow === undefined) narrow = W < 760;
+    if (narrow){
+      arcA0 = 0.15;
+      arcA1 = 0.45;
+      const yLow  = H * 0.50;                  /* 低潮：月亮较低 */
+      const yHigh = Math.max(H * 0.26, 168);   /* 高潮：月亮较高，但不顶到刊头 */
+      arcR  = Math.max(1, (yLow - yHigh) / (Math.sin(arcA1) - Math.sin(arcA0)));
+      arcCy = yLow + arcR * Math.sin(arcA0);
+      arcCx = W * 0.5 - arcR * (Math.cos(arcA0) + Math.cos(arcA1)) / 2;  /* 让横向跨度居中 */
+      moonR = clamp(Math.min(W, H) * 0.086, 34, 64);
+    } else {
+      arcCx = W * 0.30;
+      arcCy = H * 0.62;
+      arcR  = Math.min(W * 0.55, H * 0.58);
+      arcA0 = 0.20;
+      arcA1 = 1.05;
+      moonR = clamp(Math.min(W, H) * 0.098, 44, 104);
+    }
+  }
+
+  function resize(){
+    W = Math.max(320, window.innerWidth);
+    H = Math.max(420, window.innerHeight);
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+    spacing = W / (RIPPLE_N - 1);
+    rd = new Float32Array(RIPPLE_N);
+    rv = new Float32Array(RIPPLE_N);
+
+    waveN = Math.ceil(W / WSTEP) + 1;
+    /* Float32Array 默认全 0，而 0 恰好是屏幕顶端：一旦在采样前被拿去绘制，
+       整屏会被等深线涂满（看上去就是「水面先满了，然后又消失」）。先用视口下方的
+       安全值垫底，再按当前水面采一遍，任何一次绘制都不可能读到 0。 */
+    waveBuf = new Float32Array(waveN).fill(H + INTRO_SINK);
+    sampleWave(0);
+
+    /* 窄屏（手机竖屏）：月亮挪到顶部中央，扇面加宽，名牌更贴边、间距收紧 */
+    /* 与 CSS 的 max-width:760px 对齐，避免正好 760px 时样式与几何分属两套 */
+    const narrow = W <= 760;
+
+    /* 射线可及的范围：左/右留边，下留出水印与搜索钮，上避开刊头 */
+    EX0 = narrow ? Math.max(52, W * 0.075) : Math.max(84, W * 0.086);
+    EX1 = W - EX0;
+    EY0 = narrow ? 122 : 130;
+    EY1 = H - Math.max(narrow ? 120 : 74, H * 0.095);
+
+    EDGE = narrow ? EX0 : 74;
+    LABEL_GAP = narrow ? 104 : 118;
+    LABEL_ITER = narrow ? 3 : 2;
+    TILT_MAX = narrow ? 20 : 56;
+    if (narrow){ FAN_A0 = 28; FAN_SPREAD = 124; }
+    else { FAN_A0 = 40; FAN_SPREAD = 100; }
+
+    updateArc(narrow);
+
+    /* 射线角度：各分类轮转交错（相邻两条来自不同分类），再在整个扇面里均分。
+       站点数变化时（4 个、8 个…）自动重排，不必改代码。 */
+    const buckets = [];
+    for (let i = 0; i < cards.length; i++){
+      const k = cards[i].g;
+      if (!buckets[k]) buckets[k] = [];
+      buckets[k].push(i);
+    }
+    const fanOrder = [];
+    for (let go = true; go; ){
+      go = false;
+      for (let k = 0; k < buckets.length; k++){
+        if (buckets[k] && buckets[k].length){ fanOrder.push(buckets[k].shift()); go = true; }
+      }
+    }
+    FAN_STEP = FAN_SPREAD / (fanOrder.length > 1 ? fanOrder.length - 1 : 1);
+    for (let i = 0; i < fanOrder.length; i++){
+      cards[fanOrder[i]].base = FAN_A0 + i * FAN_STEP;
+      cards[fanOrder[i]].k = i;            /* 扇面次序：每帧据此重算自适应角度 */
+    }
+    /* 落点比例：主池到底；次池桌面统一收回，窄屏按序径向错开 */
+    for (let i = 0; i < cards.length; i++){
+      const c = cards[i];
+      c.lenK = poolOf(c.g) === 0 ? 1
+        : (narrow ? MINOR_LEN_NARROW[c.i % MINOR_LEN_NARROW.length] : MINOR_LEN);
+      /* 线头回缩量：射线沿名牌方框的「高度」轴进入，回缩半个框高再多留一点空隙，
+         线尖正好停在站名文字的上沿之外，不戳进字里 */
+      c.rayGap = Math.max(16, (c.el.offsetHeight || 34) * 0.5 + 6);
+    }
+    snapFan = true;         /* 下一帧直接落到新角度，不从旧角度弹过来 */
+
+    gaugeW = gTrack.offsetWidth || 160;
+    markW = gMark.offsetWidth || 9;
+
+    measureType();
+
+    if (reduced) layoutStatic();
+  }
+
+  /* ================= 名牌（射线尽头的站名） ================= */
+  function buildCards(){
+    const frag = document.createDocumentFragment();
+    DATA.forEach(function(g, gi){
+      g.sites.forEach(function(s, si){
+        const a = document.createElement('a');
+        a.className = 'ray-label' + (gi === 0 ? '' : ' minor');
+        a.href = s.url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.draggable = false;
+        a.setAttribute('aria-label', s.name + ' — ' + s.desc);
+
+        const ic = document.createElement('span');
+        ic.className = 'rl-ic';
+        /* 分类给了图标序列（月相）就按站点次序取，否则用站点自带的图标 */
+        ic.innerHTML = g.icons ? g.icons[si % g.icons.length] : s.icon;
+
+        const tx = document.createElement('span');
+        tx.className = 'rl-tx';
+        const b = document.createElement('b');
+        b.textContent = s.name;
+        const sm = document.createElement('span');
+        sm.textContent = s.desc;
+        tx.appendChild(b);
+        tx.appendChild(sm);
+
+        a.appendChild(ic);
+        a.appendChild(tx);
+        frag.appendChild(a);
+
+        cards.push({
+          el: a, site: s, g: gi, i: si,
+          name: s.name, desc: s.desc, keys: s.keys, cat: g.cat,
+          base: 90, th: 90, k: 0, state: 'rest', matched: false,
+          lenK: MINOR_LEN,
+          dx: 0, dy: 0, rot: 0, hk: 0, bx: 0, by: 0, fx: 0, fy: 0,
+          bob: new Spring(0, 46, 0.88),      /* 指针掠过后留下的阻尼余振 */
+          /* 角度与高亮各走一条欠阻尼弹簧：跟随时带一点回弹，再很快收住 */
+          ang: new Spring(90, 70, 0.85),
+          hkS: new Spring(0, 150, 0.88),
+          /* 名牌落位也走弹簧：横向略稳、纵向更慢更软 —— 跟随像浮在水上漂过去，而不是被线拽着走 */
+          px: new Spring(0, 40, 0.88),
+          py: new Spring(0, 26, 0.90),
+          /* 频率逐条错开，绝不齐步呼吸 */
+          freq: 0.132 + si * 0.023 + gi * 0.019,
+          phase: si * 1.9 + gi * 0.7
+        });
+      });
+    });
+    deck.appendChild(frag);
+  }
+
+  /* ================= 搜索 ================= */
+  function applySearch(){
+    const q = searchEl.value.trim().toLowerCase();
+    const active = q.length > 0;
+    let hits = 0;
+
+    cards.forEach(function(c){
+      c.matched = active &&
+        (c.name + ' ' + c.desc + ' ' + c.keys + ' ' + c.cat).toLowerCase().includes(q);
+      if (c.matched) hits++;
+      c.state = !active ? 'rest' : (c.matched ? 'lit' : 'sunk');
+      c.el.classList.toggle('lit', c.state === 'lit');
+      c.el.classList.toggle('sunk', c.state === 'sunk');
+    });
+
+    if (active){
+      hintEl.textContent = hits ? '命中 ' + hits + ' 个' : '无命中';
+      emptyState.hidden = hits > 0;
+    } else {
+      hintEl.textContent = '';
+      emptyState.hidden = true;
+    }
+    if (reduced) layoutStatic();
+  }
+
+  function openSearch(){
+    dock.classList.add('open');
+    searchToggle.setAttribute('aria-expanded', 'true');
+    searchEl.focus();
+  }
+  function closeSearch(clear){
+    dock.classList.remove('open');
+    searchToggle.setAttribute('aria-expanded', 'false');
+    if (clear && searchEl.value){
+      searchEl.value = '';
+      applySearch();
+    }
+  }
+
+  /* ================= 几何 ================= */
+  /* 射线与内缩矩形的交点（slab 法），返回沿线距离 t */
+  function rayLen(cx, cy, th){
+    const dx = Math.cos(th), dy = Math.sin(th);
+    let t = Infinity;
+    if (dx > 1e-6) t = Math.min(t, (EX1 - cx) / dx);
+    else if (dx < -1e-6) t = Math.min(t, (EX0 - cx) / dx);
+    if (dy > 1e-6) t = Math.min(t, (EY1 - cy) / dy);
+    else if (dy < -1e-6) t = Math.min(t, (EY0 - cy) / dy);
+    return (isFinite(t) && t > 0) ? t : 0;
+  }
+  /* 主池（小游戏）长线到底，次池（工具）短线收进来 */
+  const MINOR_LEN = 0.60;
+  /* 窄屏：三条工具线取不同长度，径向错开，避免挤在月亮附近 */
+  const MINOR_LEN_NARROW = [0.58, 0.74, 0.90];
+  /* 分类 → 射线池：第 0 个分类是主池（长线 · 红），其余分类都归次池（短线 · 灰） */
+  function poolOf(g){ return g === 0 ? 0 : 1; }
+  const RAY_STOP = [
+    { w: 1.7, s: 'rgba(16,20,24,.92)', hw: 2.4, hs: 'rgba(216,53,42,.95)' },
+    { w: 1.0, s: 'rgba(16,20,24,.17)', hw: 1.5, hs: 'rgba(139,145,154,.92)' }
+  ];
+  const WEDGE = ['rgba(216,53,42,.055)', 'rgba(16,20,24,.05)'];
+  /* 某条射线的实际落点距离：主池到底，次池按各自 lenK 收进来 */
+  function rayStop(th, c){
+    return rayLen(cen.x, cen.y, th) * c.lenK;
+  }
+
+  /* 扇形随月亮自适应：最外的两条射线始终瞄准左右壁上同一高度 aimY。
+     月亮上下走动时扇形随之张合偏移 —— 射线的角度、长度与间距都在连续变化，
+     名牌因此始终铺满下方、间距均匀（月亮位置本身已被弹簧平滑，故不会跳）。 */
+  function aimFan(){
+    const aimY = EY0 + (EY1 - EY0) * 0.62;
+    const dyAim = aimY - moonY;
+    let aR = FAN_A0, aL = FAN_A0 + FAN_SPREAD;
+    if (dyAim > 1){
+      aR = Math.atan2(dyAim, EX1 - moonX) / RAD;
+      aL = Math.atan2(dyAim, EX0 - moonX) / RAD;
+    }
+    const span = clamp(aL - aR, FAN_SPREAD * 0.95, Math.min(168, FAN_SPREAD * 1.68));
+    const a0 = clamp((aL + aR) / 2 - span / 2, 8, 172 - span);
+    FAN_STEP = span / (cards.length > 1 ? cards.length - 1 : 1);
+    for (let i = 0; i < cards.length; i++){
+      cards[i].base = a0 + cards[i].k * FAN_STEP;
+    }
+  }
+
+  /* 指针落在哪一束（按角带），不在扇面内返回 -1 */
+  function hitRay(x, y){
+    const dx = x - cen.x, dy = y - cen.y;
+    const d = Math.hypot(dx, dy);
+    if (d < cen.r + 8) return -1;
+    let th = Math.atan2(dy, dx) / RAD;
+    if (th < 0) th += 360;
+    let best = -1, bestD = Infinity;
+    for (let i = 0; i < cards.length; i++){
+      let dd = Math.abs(((th - cards[i].th + 540) % 360) - 180);
+      if (dd < bestD){ bestD = dd; best = i; }
+    }
+    return bestD > FAN_STEP * 0.56 ? -1 : best;
+  }
+
+  function setHover(i){
+    if (i === hoverIdx) return;
+    /* 离场：轻轻回落；入场：被水推了一把，余振自然衰减 */
+    if (hoverIdx >= 0 && cards[hoverIdx]){
+      cards[hoverIdx].el.classList.remove('hot');
+      cards[hoverIdx].bob.v -= 30;
+    }
+    hoverIdx = i;
+    if (hoverIdx >= 0 && cards[hoverIdx]){
+      cards[hoverIdx].el.classList.add('hot');
+      cards[hoverIdx].bob.v += 64;
+    }
+  }
+
+  /* ================= 单帧步进 ================= */
+  function step(dt, t){
+    /* 指针速度（px/s）：一阶低通，指针停下即衰减回 0 */
+    const ivx = mouse.x - mouse.px, ivy = mouse.y - mouse.py;
+    mouse.px = mouse.x;
+    mouse.py = mouse.y;
+    /* dt=0 时不做除法（0/0=NaN），目标直接取 0 */
+    const spdX = dt > 0 ? clamp(ivx / dt, -3200, 3200) : 0;
+    const spdY = dt > 0 ? clamp(ivy / dt, -3200, 3200) : 0;
+    mouse.svx = follow(mouse.svx, spdX, 9, dt);
+    mouse.svy = follow(mouse.svy, spdY, 9, dt);
+    mouse.speed = Math.hypot(mouse.svx, mouse.svy);
+
+    /* 月亮：沿轨道弧线抬升（轨道随断点不同） */
+    hMoon = follow(hMoon, hMoonTarget, (mouse.dragMoon || mouse.dragTide) ? 14 : 3.4, dt);
+    const ang = lerp(arcA0, arcA1, hMoon);
+    moonX = arcCx + arcR * Math.cos(ang);
+    moonY = arcCy - arcR * Math.sin(ang);
+    cen.x = moonX; cen.y = moonY; cen.r = moonR;
+
+    /* 潮位 */
+    tide = follow(tide, mouse.dragTide ? hMoonTarget : hMoon, mouse.dragTide ? 14 : 2.4, dt);
+    waterY = lerp(H * 0.86, H * 0.40, tide);
+
+    /* 开场：推进计时。INTRO_END 时刻水面已精确等于静水线，故切换 introDone 无跳变 */
+    if (!introDone && isFinite(dt) && dt > 0){
+      introT += dt;
+      if (introT >= INTRO_END) introDone = true;
+    }
+
+    /* 潮位计的水痕：水位变化越快越晃，松手后余摆慢慢平复 */
+    if (reduced){ slosh.x = 0; slosh.v = 0; }
+    else {
+      slosh.t = clamp((tide - lastTide) / Math.max(0.001, dt) * 1.1, -4, 4);
+      slosh.step(dt);
+    }
+    lastTide = tide;
+
+    /* 潮位计整框：把它当成浮在水上的浮标 —— 潮位推着它浮沉，指针速度带着它横漂与倾侧，
+       水痕的余波（slosh）再让它轻轻摆。三条弹簧各有阻尼，指针停住后自己收敛，不是机械归位。 */
+    const gvx = mouse.dragTide ? 0 : mouse.svx;
+    gaugeX.t = clamp(gvx * 0.0032, -3.2, 3.2);
+    gaugeY.t = (0.5 - tide) * 4.6
+             + clamp(mouse.svy * 0.0016, -1.5, 1.5)
+             + Math.sin(t * TAU * 0.085) * 1.5        /* 极慢的涌浪，静止时也有呼吸 */
+             - (mouse.overGauge ? 2.4 : 0);           /* 指针凑近时被水托起一点 */
+    gaugeR.t = clamp(gvx * 0.0012, -0.7, 0.7)
+             + slosh.x * 0.055
+             + Math.sin(t * TAU * 0.052 + 1.1) * 0.25;
+    gaugeX.step(dt);
+    gaugeY.step(dt);
+    gaugeR.step(dt);
+
+    /* 水面质点链 */
+    for (let i = 1; i < RIPPLE_N - 1; i++){
+      const acc = (rd[i - 1] + rd[i + 1] - 2 * rd[i]) * 400;
+      rv[i] += acc * dt;
+      rv[i] *= Math.pow(0.992, dt * 60);
+      rd[i] += rv[i] * dt;
+      rd[i] *= Math.pow(0.9975, dt * 60);
+    }
+
+    /* 扇形随月亮自适应：最外的两条射线始终瞄准左右壁上的同一高度（aimY），
+       月亮走到哪，射线的角度、长度与间距都跟着连续变化，名牌始终铺满下方；
+       月亮位置本身就是弹簧平滑的，所以这里天然是有过渡的动效，不会跳。 */
+    aimFan();
+    const snap = snapFan;               /* 本帧是否需要直接落位（布局刚变过） */
+    snapFan = false;
+
+    /* 射线束转动：拖拽中 1:1 跟手，松手后交给弹簧收敛 */
+    if (!rot.active) fan.step(dt);
+    for (let i = 0; i < cards.length; i++){
+      const c = cards[i];
+      /* 每条射线自己再走一条欠阻尼弹簧：月亮或潮位一动，线会「跟过去、再回一点」，
+         名牌挂在线上所以整体同步摆，不会脱节；拖拽时仍 1:1 跟手。 */
+      c.ang.t = c.base + fan.x;
+      if (rot.active || snap){ c.ang.x = c.ang.t; c.ang.v = 0; }
+      else c.ang.step(dt);
+      c.th = clamp(c.ang.x, 10, 170);
+    }
+
+    /* 名牌随水浮动：慢涌 + 涟漪耦合 + 指针掠过后的阻尼余振。
+       三条不同频率的正弦，彼此永不同步。 */
+    for (let i = 0; i < cards.length; i++){
+      const c = cards[i];
+      const th = c.th * RAD;
+      const stop = rayStop(th, c);
+      c.bx = cen.x + Math.cos(th) * stop;      /* 射线落点（浮动的基准） */
+      c.by = cen.y + Math.sin(th) * stop;
+      c.hkS.t = (i === hoverIdx || c.state === 'lit') ? 1 : 0;
+      c.hkS.step(dt);
+      c.hk = c.hkS.x;
+      c.bob.step(dt);
+      const amp = (c.g === 0 ? 6.4 : 4.2) * (1 + c.hk * 0.95);
+      const ph = t * TAU * c.freq + c.phase;
+      c.fx = c.bx + Math.sin(ph * 0.62 + 1.7) * amp * 0.32;
+      c.fy = c.by + Math.sin(ph) * amp + c.bob.x + clamp(rippleAt(c.bx) * 0.09, -13, 13);
+      c.rot = Math.sin(ph * 0.83 + 0.6) * (c.g === 0 ? 0.85 : 0.55) + c.bob.x * 0.16;
+    }
+
+    /* 名牌互斥：靠得太近就沿连线轻推开，窄屏也不叠字（多推几轮收敛） */
+    for (let it = 0; it < LABEL_ITER; it++){
+      for (let a = 0; a < cards.length - 1; a++){
+        for (let b = a + 1; b < cards.length; b++){
+          const A = cards[a], B = cards[b];
+          const ux = B.fx - A.fx, uy = B.fy - A.fy;
+          const d = Math.hypot(ux, uy) || 1;
+          if (d >= LABEL_GAP) continue;
+          const p = (LABEL_GAP - d) * 0.5 / d;
+          A.fx -= ux * p; A.fy -= uy * p;
+          B.fx += ux * p; B.fy += uy * p;
+        }
+      }
+    }
+    /* 名牌落位也走弹簧：横向略硬、纵向更软，跟随像浮在水上；
+       射线端点就是名牌位置，所以线会顺着名牌轻轻弯，始终连着不脱节。 */
+    for (let i = 0; i < cards.length; i++){
+      const c = cards[i];
+      c.px.t = clamp(c.fx, EDGE, W - EDGE);
+      c.py.t = clamp(c.fy, 34, H - 30);
+      if (snap){ c.px.x = c.px.t; c.px.v = 0; c.py.x = c.py.t; c.py.v = 0; }
+      else { c.px.step(dt); c.py.step(dt); }
+      c.dx = c.px.x - c.bx;
+      c.dy = c.py.x - c.by;
+    }
+
+    /* 环境次生运动 */
+    starJ.t = clamp(mouse.svx * 0.0022, -1.2, 1.2);
+    starJ.step(dt);
+  }
+
+  /* ================= 绘制 ================= */
+  /* 水面在 x 处的涟漪位移（名牌与涟漪共用同一条波） */
+  function rippleAt(x){
+    const fi = x / spacing;
+    const i0 = Math.floor(fi);
+    const f = fi - i0;
+    const a = rd[clamp(i0, 0, RIPPLE_N - 1)] || 0;
+    const b = rd[clamp(i0 + 1, 0, RIPPLE_N - 1)] || 0;
+    return lerp(a, b, f);
+  }
+
+  /* 开场水面：整幅水线一起从视口下方缓动升到静水线。没有逐列差异，所以看不出横向扫入。 */
+  function introSurface(rest){
+    if (introDone) return rest;
+    const p = easeInOutCubic(clamp(introT / INTRO_RISE, 0, 1));
+    return lerp(H + INTRO_SINK, rest, p);
+  }
+
+  function sampleWave(t){
+    for (let j = 0; j < waveN; j++){
+      const x = j * WSTEP;
+      const s = Math.sin(x * 0.0135 + t * 0.85) * 4.2
+              + Math.sin(x * 0.031 - t * 1.4) * 2.4
+              + Math.sin(x * 0.0062 + t * 0.5) * 6.4;
+      const v = introSurface(waterY + rippleAt(x) + s);
+      waveBuf[j] = isFinite(v) ? v : H + INTRO_SINK;   /* 数值异常时退回屏幕外，绝不画到屏幕顶端 */
+    }
+  }
+
+  function drawWater(t){
+    if (!seaOn) return;
+
+    /* 水下：只剩一条条细线（等深线），越深越淡 */
+    ctx.lineWidth = 1;
+    let k = 1;
+    let off = 11;
+    /* 用「实际采样到的水面」判断要不要继续往下画，而不是用还没开场的 waterY：
+       开场时整条水线还在视口下方，这里第一轮就 break，不会白画几十条屏外线。 */
+    let surf = waveBuf[0];
+    if (!isFinite(surf)) surf = waterY;
+    while (k <= 34){
+      const y = surf + off;
+      if (y > H + 24) break;
+      const f = k / 26;
+      if (f >= 1) break;
+      ctx.globalAlpha = 0.24 * (1 - f) * (1 - f) + 0.035;
+      ctx.strokeStyle = f < 0.30 ? 'rgb(11,79,168)' : 'rgb(16,20,24)';
+      ctx.lineWidth = (k % 6 === 0) ? 1.2 : 0.8;
+      ctx.beginPath();
+      for (let j = 0; j < waveN; j++){
+        const yy = waveBuf[j] + off;
+        if (j === 0) ctx.moveTo(j * WSTEP, yy); else ctx.lineTo(j * WSTEP, yy);
+      }
+      ctx.stroke();
+      off += 11 + k * 1.15;
+      k++;
+    }
+    ctx.globalAlpha = 1;
+
+    /* 水线：一条干净的墨线 */
+    ctx.beginPath();
+    for (let j = 0; j < waveN; j++){
+      const yy = waveBuf[j];
+      if (j === 0) ctx.moveTo(j * WSTEP, yy); else ctx.lineTo(j * WSTEP, yy);
+    }
+    ctx.strokeStyle = 'rgba(16,20,24,.66)';
+    ctx.lineWidth = 1.1;
+    ctx.stroke();
+
+    /* 月光落水：月亮正下方一小段渐宽的短线（跟月亮脚下的实际水面走，别从干地上画起） */
+    const wi = clamp(Math.round(moonX / WSTEP), 0, Math.max(0, waveN - 1));
+    let moonWater = waveBuf[wi];
+    if (!isFinite(moonWater)) moonWater = waterY;
+    for (let m = 0; m < 7; m++){
+      const yy = moonWater + 13 + m * 14;
+      if (yy > H - 8) break;
+      const wdt = 12 + m * 8;
+      ctx.globalAlpha = 0.15 * (1 - m / 8);
+      ctx.fillStyle = 'rgb(11,79,168)';
+      ctx.fillRect(moonX - wdt / 2 + Math.sin(t * 1.4 + m) * 4, yy, wdt, 1);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function draw(t){
+    /* 透明清屏：纸面与台词在 canvas 下层，月亮与海随后画在其上 */
+    ctx.clearRect(0, 0, W, H);
+
+    /* 网格：细线一档、主线一档 */
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(16,20,24,.038)';
+    ctx.beginPath();
+    for (let x = 88; x < W; x += 88){ const px = Math.round(x) + .5; ctx.moveTo(px, 0); ctx.lineTo(px, H); }
+    for (let y = 88; y < H; y += 88){ const py = Math.round(y) + .5; ctx.moveTo(0, py); ctx.lineTo(W, py); }
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(16,20,24,.07)';
+    ctx.beginPath();
+    for (let x = 352; x < W; x += 352){ const px = Math.round(x) + .5; ctx.moveTo(px, 0); ctx.lineTo(px, H); }
+    for (let y = 352; y < H; y += 352){ const py = Math.round(y) + .5; ctx.moveTo(0, py); ctx.lineTo(W, py); }
+    ctx.stroke();
+
+    /* 水（只画线） */
+    sampleWave(t);
+    drawWater(t);
+
+    /* 月亮轨道：虚线弧 */
+    ctx.save();
+    ctx.setLineDash([2, 6]);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(16,20,24,.28)';
+    ctx.beginPath();
+    ctx.arc(arcCx, arcCy, arcR, -arcA1, -arcA0);
+    ctx.stroke();
+    ctx.restore();
+
+    /* 悬停扇区：极淡的一块，让「分块」看得见 */
+    if (hoverIdx >= 0 && cards[hoverIdx]){
+      const hc = cards[hoverIdx];
+      const half = FAN_STEP * 0.5;
+      const k = hc.lenK;
+      const a1 = (hc.th - half) * RAD, a2 = (hc.th + half) * RAD;
+      const t1 = rayLen(cen.x, cen.y, a1) * k, t2 = rayLen(cen.x, cen.y, a2) * k;
+      ctx.beginPath();
+      ctx.moveTo(cen.x, cen.y);
+      ctx.lineTo(cen.x + Math.cos(a1) * t1, cen.y + Math.sin(a1) * t1);
+      ctx.lineTo(cen.x + Math.cos(a2) * t2, cen.y + Math.sin(a2) * t2);
+      ctx.closePath();
+      ctx.fillStyle = WEDGE[poolOf(hc.g)];
+      ctx.fill();
+    }
+
+    /* 射线：先画次池（短线浅灰），主池（长线墨黑）压在上面 */
+    for (let pass = 1; pass >= 0; pass--){
+      const st = RAY_STOP[pass];
+      for (let i = 0; i < cards.length; i++){
+        const c = cards[i];
+        if (poolOf(c.g) !== pass) continue;
+        const th = c.th * RAD;
+        const dx = Math.cos(th), dy = Math.sin(th);
+        const sx = cen.x + dx * (cen.r + 9), sy = cen.y + dy * (cen.r + 9);
+        /* 回缩 c.rayGap：线尖停在站名文字上沿之外；再兜底，几何退化或非有限数时绝不丢线 */
+        let len = rayStop(th, c) - (c.rayGap || 26);
+        if (!isFinite(len) || len < cen.r + 18) len = cen.r + 18;
+        /* 线端跟着名牌一起浮，于是整条射线也跟着摆 */
+        const ex = cen.x + dx * len + c.dx, ey = cen.y + dy * len + c.dy;
+
+        /* 高亮由弹簧驱动：线宽连续插值、颜色淡入，而不是「啪」地一切 */
+        const hk = clamp(c.hk, 0, 1.15);
+        ctx.beginPath();
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(ex, ey);
+        ctx.strokeStyle = st.s;
+        ctx.lineWidth = st.w + (st.hw - st.w) * hk;
+        ctx.stroke();
+        if (hk > 0.01){
+          ctx.globalAlpha = Math.min(1, hk);
+          ctx.strokeStyle = st.hs;
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+        }
+
+        /* 起点的罗盘短刻（只有长线主池才有） */
+        if (!pass){
+          ctx.beginPath();
+          ctx.moveTo(sx + dy * 7, sy - dx * 7);
+          ctx.lineTo(sx - dy * 7, sy + dx * 7);
+          ctx.strokeStyle = st.s;
+          ctx.lineWidth = 1.7;
+          ctx.stroke();
+          if (hk > 0.01){
+            ctx.globalAlpha = Math.min(1, hk);
+            ctx.strokeStyle = st.hs;
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+          }
+        }
+      }
+    }
+
+    /* 月体：银白实心 + 墨线环 + 细坑环 */
+    ctx.beginPath();
+    ctx.arc(moonX, moonY, moonR, 0, TAU);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.lineWidth = 2.4;
+    ctx.strokeStyle = 'rgba(16,20,24,.88)';
+    ctx.stroke();
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(moonX, moonY, moonR, 0, TAU);
+    ctx.clip();
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(16,20,24,.16)';
+    for (let i = 0; i < craters.length; i++){
+      const kk = craters[i];
+      ctx.beginPath();
+      ctx.arc(moonX + kk.dx * moonR, moonY + kk.dy * moonR, kk.r * moonR, 0, TAU);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    /* 红色准星：跟随指针（落在月亮上时不显示） */
+    if (mouse.seen && !mouse.overUI && !moonHit(mouse.x, mouse.y)){
+      const mx = mouse.x, my = mouse.y, g0 = 4.5, g1 = 15;
+      ctx.strokeStyle = 'rgba(216,53,42,.60)';
+      ctx.lineWidth = 1.1;
+      ctx.beginPath();
+      ctx.moveTo(mx, my - g1); ctx.lineTo(mx, my - g0);
+      ctx.moveTo(mx, my + g0); ctx.lineTo(mx, my + g1);
+      ctx.moveTo(mx - g1, my); ctx.lineTo(mx - g0, my);
+      ctx.moveTo(mx + g0, my); ctx.lineTo(mx + g1, my);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(216,53,42,.60)';
+      ctx.fillRect(mx - 0.6, my - 0.6, 1.2, 1.2);
+    }
+  }
+
+  /* ================= 名牌就位 ================= */
+  function placeLabels(){
+    for (let i = 0; i < cards.length; i++){
+      const c = cards[i];
+      const th = c.th * RAD;
+      const t2 = rayStop(th, c);
+      const t = (isFinite(t2) && t2 > cen.r + 18) ? t2 : cen.r + 18;
+      const lx = clamp(cen.x + Math.cos(th) * t + c.dx, EDGE, W - EDGE);
+      const ly = clamp(cen.y + Math.sin(th) * t + c.dy, 34, H - 30);
+      const r = clamp(c.th - 90 + c.rot, -TILT_MAX, TILT_MAX);
+      c.el.style.transform =
+        'translate3d(' + lx.toFixed(1) + 'px,' + ly.toFixed(1) + 'px,0) ' +
+        'translate(-50%,-50%) rotate(' + r.toFixed(2) + 'deg) ' +
+        'scale(' + (1 + c.hk * 0.045).toFixed(3) + ')';   /* 高亮时轻微「弹」一下 */
+    }
+  }
+
+  /* 星尘层的次生位移：只改合成器 transform，不触发重绘 */
+  let lastDustX = NaN;
+  function updateDust(){
+    const x = Math.round(starJ.x * 2.4 * 100) / 100;
+    if (x === lastDustX) return;
+    lastDustX = x;
+    dust.style.transform = 'translate3d(' + x + 'px,0,0)';
+  }
+
+  let lastGaugeText = 0;
+  function updateGauge(t){
+    const p = clamp(tide, 0, 1);
+    const tilt = reduced ? 0 : slosh.x;
+    const tt = isFinite(t) ? t : 0;
+    /* 整框的浮标姿态：横漂 / 浮沉 / 倾侧（由三条弹簧驱动，指针停住后自行收敛） */
+    gaugeEl.style.transform = reduced ? '' :
+      'translate3d(' + gaugeX.x.toFixed(2) + 'px,' + gaugeY.x.toFixed(2) + 'px,0) ' +
+      'rotate(' + gaugeR.x.toFixed(3) + 'deg)';
+    /* 水痕只横向生长 */
+    gFill.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+    /* 水头：惯性越大浪越高（scaleY 当振幅），再随极慢的涌浪轻轻浮沉（translateY）；
+       浮标跟着这条水面一起上下 —— 像真浮在水上，而不是滑过一根轨道 */
+    const bob = reduced ? 0
+      : clamp(Math.sin(tt * TAU * 0.9 + 0.7) * 0.45 + tilt * 0.28, -1.7, 1.7);
+    const amp = reduced ? 1 : clamp(1 + Math.abs(tilt) * 0.14, 1, 1.5);
+    gWave.style.transform =
+      'translate3d(' + (p * gaugeW - 8).toFixed(2) + 'px,' + bob.toFixed(2) + 'px,0) ' +
+      'scaleY(' + amp.toFixed(3) + ')';
+    gMark.style.transform =
+      'translate3d(' + (p * Math.max(0, gaugeW - markW)).toFixed(1) + 'px,' + (bob * 0.8).toFixed(2) + 'px,0) ' +
+      'rotate(' + (tilt * 1.6).toFixed(2) + 'deg)';
+    const now = Date.now();
+    if (now - lastGaugeText > 220){
+      lastGaugeText = now;
+      tideNumEl.textContent = p.toFixed(2);
+    }
+  }
+
+  /* ================= 静态布局（reduced motion） ================= */
+  function layoutStatic(keepIntro){
+    hMoon = hMoonTarget;
+    tide = hMoon;
+    waterY = lerp(H * 0.86, H * 0.40, tide);
+    /* 减少动态偏好：不做开场，直接落位；开场模式则保留计时归零，让海水从底部重新漫上 */
+    if (!keepIntro){ introT = INTRO_END; introDone = true; }
+    const ang = lerp(arcA0, arcA1, hMoon);
+    moonX = arcCx + arcR * Math.cos(ang);
+    moonY = arcCy - arcR * Math.sin(ang);
+    cen.x = moonX; cen.y = moonY; cen.r = moonR;
+    fan.x = fan.t = 0;
+    /* 整框的浮标弹簧归位，避免布局切换时从旧姿态弹过来 */
+    gaugeX.x = gaugeX.v = gaugeX.t = 0;
+    gaugeY.x = gaugeY.v = gaugeY.t = 0;
+    gaugeR.x = gaugeR.v = gaugeR.t = 0;
+    aimFan();
+    cards.forEach(function(c){
+      c.th = c.base;
+      c.ang.x = c.ang.t = c.base; c.ang.v = 0;
+      c.hkS.x = c.hkS.t = 0; c.hkS.v = 0;
+      c.dx = 0; c.dy = 0; c.rot = 0; c.hk = 0;
+      c.bob.x = 0; c.bob.v = 0;
+    });
+    snapFan = true;
+
+    placeLabels();
+    updateGauge();
+    draw(0);
+    if (reduced) resetType();
+  }
+
+  /* ================= 主循环 ================= */
+  let raf = null, last = 0, t0 = 0;
+
+  function loop(now){
+    raf = requestAnimationFrame(loop);
+    const raw = (now - last) / 1000;
+    last = now;
+    /* dt 恒有限且 ≥0：首帧/时钟抖动可能给出 raw≤0，绝不让它污染后续数值链 */
+    const dt = isFinite(raw) ? Math.min(Math.max(raw, 0), 1 / 30) : 0;
+    const t = (now - t0) / 1000;
+    step(dt, t);
+    updateType(dt, t, now);
+    draw(t);
+    placeLabels();
+    updateDust();
+    updateGauge(t);
+  }
+
+  function start(){
+    if (raf !== null || reduced) return;
+    if (!t0) t0 = performance.now();
+    last = performance.now();
+    raf = requestAnimationFrame(loop);
+  }
+  function stop(){
+    if (raf !== null){ cancelAnimationFrame(raf); raf = null; }
+  }
+
+  /* ================= 涟漪注入 ================= */
+  function injectRipple(x, dy){
+    if (!rv) return;
+    const i = Math.round(x / spacing);
+    if (i < 2 || i > RIPPLE_N - 3) return;
+    const amp = clamp(-dy * 11, -420, 420);
+    rv[i] += amp;
+    rv[i - 1] += amp * 0.5;
+    rv[i + 1] += amp * 0.5;
+  }
+
+  /* ================= 月亮拖动 ================= */
+  function moonHit(x, y){
+    return Math.hypot(x - moonX, y - moonY) < moonR + 30;
+  }
+  /* 双击月亮：放干 / 重新灌满海水（整片切换，不做满屏推进动画） */
+  let moonTapAt = 0, moonTapX = 0, moonTapY = 0;
+  function toggleWater(){
+    seaOn = !seaOn;
+    if (reduced) layoutStatic();
+  }
+  /* 把指针投影到月亮轨道的两端连线上：桌面近似上下拖，窄屏近似左右拖 */
+  function setMoonFromPointer(x, y){
+    const hx = arcCx + arcR * Math.cos(arcA1), hy = arcCy - arcR * Math.sin(arcA1);
+    const lx = arcCx + arcR * Math.cos(arcA0), ly = arcCy - arcR * Math.sin(arcA0);
+    const dx = hx - lx, dy = hy - ly;
+    const len2 = dx * dx + dy * dy || 1;
+    hMoonTarget = clamp(((x - lx) * dx + (y - ly) * dy) / len2, 0, 1);
+  }
+  function setTideFromPointer(x){
+    const r = gTrack.getBoundingClientRect();
+    hMoonTarget = clamp((x - r.left) / Math.max(1, r.width), 0, 1);
+  }
+
+  /* ================= 转动整束射线 ================= */
+  function nudgeFan(deg){
+    fan.t = clamp(fan.t + deg, -FAN_LIM, FAN_LIM);
+    if (reduced){ fan.x = fan.t; layoutStatic(); }
+  }
+
+  /* ================= 事件 ================= */
+  function setCursor(c){
+    if (c !== mouse.cursor){ mouse.cursor = c; canvas.style.cursor = c; }
+  }
+
+  function bindEvents(){
+    let resizeTimer = null;
+    window.addEventListener('resize', function(){
+      if (resizeTimer) clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function(){ resize(); }, 150);
+    });
+
+    document.addEventListener('visibilitychange', function(){
+      if (document.hidden){ stop(); }
+      else if (!reduced){ last = performance.now(); start(); }
+    });
+
+    mqReduce.addEventListener('change', function(e){
+      reduced = e.matches;
+      if (reduced){ stop(); layoutStatic(); }
+      else { t0 = performance.now(); last = t0; start(); }
+    });
+
+    window.addEventListener('pointermove', function(e){
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      mouse.seen = true;
+      const dy = lastPY < 0 ? 0 : e.clientY - lastPY;
+      lastPY = e.clientY;
+
+      if (mouse.dragTide){
+        mouse.overUI = true;
+        setTideFromPointer(e.clientX);
+        if (reduced) layoutStatic();
+        e.preventDefault();
+        return;
+      }
+      if (mouse.dragMoon){
+        mouse.overUI = true;
+        setMoonFromPointer(e.clientX, e.clientY);
+        if (reduced) layoutStatic();
+        e.preventDefault();
+        return;
+      }
+      if (rot.active){
+        mouse.overUI = true;
+        const dtn = Math.max(1, e.timeStamp - rot.lt);
+        rot.v = rot.v * 0.72 + ((e.clientX - rot.lx) / dtn * 1000) * 0.28;
+        rot.lx = e.clientX;
+        rot.lt = e.timeStamp;
+        const dx = e.clientX - rot.sx;
+        rot.moved = Math.max(rot.moved, Math.abs(dx));
+        fan.t = clamp(rot.start - dx * 0.16, -FAN_LIM, FAN_LIM);
+        fan.x = fan.t;
+        fan.v = 0;
+        if (reduced) layoutStatic();
+        e.preventDefault();
+        return;
+      }
+
+      /* 悬停：名牌或扇区一起高亮 */
+      const el = e.target;
+      const overUI = el && el.closest && (el.closest('.hud') || el.closest('.dock'));
+      const label = el && el.closest ? el.closest('.ray-label') : null;
+      let hi = -1;
+      if (label){ hi = cards.findIndex(function(c){ return c.el === label; }); }
+      else if (!overUI){ hi = hitRay(e.clientX, e.clientY); }
+      setHover(hi);
+      mouse.overUI = !!(overUI || label);
+      /* 指针凑近潮位计整框时，它被水托起一点（浮标手感） */
+      mouse.overGauge = !!(el && el.closest && el.closest('.gauge'));
+
+      if (moonHit(e.clientX, e.clientY)) setCursor('grab');
+      else if (hi >= 0) setCursor('ew-resize');
+      else setCursor('default');
+
+      if (!reduced) injectRipple(e.clientX, dy);
+    }, { passive: false });
+
+    window.addEventListener('pointerdown', function(e){
+      if (e.target.closest && (e.target.closest('.hud') || e.target.closest('.dock') || e.target.closest('.ray-label'))) return;
+      if (moonHit(e.clientX, e.clientY)){
+        /* 双击（连点）月亮：放干 / 重新灌入海水 */
+        const tn = performance.now();
+        if (tn - moonTapAt < 360 && Math.hypot(e.clientX - moonTapX, e.clientY - moonTapY) < 30){
+          moonTapAt = 0;
+          toggleWater();
+          e.preventDefault();
+          return;
+        }
+        moonTapAt = tn; moonTapX = e.clientX; moonTapY = e.clientY;
+        mouse.dragMoon = true;
+        canvas.style.cursor = 'grabbing';
+        e.preventDefault();
+        return;
+      }
+      /* 空白处按下：预备转动整束射线 */
+      rot.active = true;
+      rot.sx = rot.lx = e.clientX;
+      rot.start = fan.t;
+      rot.lt = e.timeStamp;
+      rot.v = 0;
+      rot.moved = 0;
+      canvas.style.cursor = 'ew-resize';
+    }, { passive: false });
+
+    window.addEventListener('pointerup', function(){
+      if (mouse.dragMoon){
+        mouse.dragMoon = false;
+        canvas.style.cursor = 'grab';
+      }
+      if (mouse.dragTide){
+        mouse.dragTide = false;
+        gaugeEl.classList.remove('dragging');
+      }
+      if (rot.active){
+        rot.active = false;
+        fan.t = clamp(fan.x + rot.v * 0.16, -FAN_LIM, FAN_LIM);
+        fan.v = clamp(-rot.v * 0.05, -120, 120);
+        if (reduced){ fan.x = fan.t; fan.v = 0; layoutStatic(); }
+      }
+    });
+
+    window.addEventListener('pointercancel', function(){
+      mouse.dragMoon = false;
+      mouse.dragTide = false;
+      rot.active = false;
+      gaugeEl.classList.remove('dragging');
+      setCursor('default');
+    });
+
+    document.documentElement.addEventListener('mouseleave', function(){
+      setHover(-1);
+    });
+
+    /* 滚轮 / 触摸板：累积到阈值才转动一格 */
+    window.addEventListener('wheel', function(e){
+      const now = performance.now();
+      if (now < wheelLock) return;
+      const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      if ((d > 0) !== (wheelAcc > 0)) wheelAcc = 0;
+      wheelAcc += e.deltaMode === 1 ? d * 16 : (e.deltaMode === 2 ? d * H : d);
+      if (Math.abs(wheelAcc) >= 46){
+        nudgeFan(wheelAcc > 0 ? 7 : -7);
+        wheelAcc = 0;
+        wheelLock = now + 80;
+      }
+    }, { passive: true });
+
+    /* 转动过后拦掉误触的点击 */
+    document.addEventListener('click', function(e){
+      if (rot.moved > 6){
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      rot.moved = 0;
+    }, true);
+
+    /* 潮位计：左右拖动，联动月亮与潮位 */
+    gaugeEl.addEventListener('pointerdown', function(e){
+      mouse.dragTide = true;
+      gaugeEl.classList.add('dragging');
+      setTideFromPointer(e.clientX);
+      if (reduced) layoutStatic();
+      e.preventDefault();
+    }, { passive: false });
+
+    searchEl.addEventListener('input', applySearch);
+
+    searchToggle.addEventListener('click', function(){
+      if (dock.classList.contains('open')) closeSearch(true);
+      else openSearch();
+    });
+    searchClose.addEventListener('click', function(){ closeSearch(true); });
+
+    document.addEventListener('keydown', function(e){
+      const tag = e.target && e.target.tagName;
+      const inField = tag === 'INPUT' || tag === 'TEXTAREA';
+      if (!inField){
+        if (e.key === 'ArrowRight'){ nudgeFan(7); e.preventDefault(); return; }
+        if (e.key === 'ArrowLeft'){ nudgeFan(-7); e.preventDefault(); return; }
+      }
+      if (e.key !== 'Escape') return;
+      if (dock.classList.contains('open')) closeSearch(true);
+    });
+  }
+
+  /* ================= 启动 ================= */
+  function init(){
+    buildCards();
+    buildLyrics();
+    buildType();
+    resize();
+    applySearch();
+    bindEvents();
+
+    if (reduced){
+      layoutStatic();
+    } else {
+      layoutStatic(true);   /* 保留开场计时：init 这一帧水面在屏幕下方，随后由 loop 慢慢漫上 */
+      t0 = performance.now();
+      last = t0;
+      start();
+    }
+  }
+
+  init();
 })();
 </script>
 </body>
